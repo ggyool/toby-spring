@@ -2,12 +2,13 @@ package org.ggyool.toby.user.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.sql.DataSource;
 import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -16,20 +17,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 JdbcTemplate을 사용할 때에만 그렇다는 생각을 하고 있음.
 쌩 JDBC API를 사용한 UserDaoTest의 경우 롤백되지 않는다.
  */
+@AutoConfigureTestDatabase(replace = Replace.NONE) // application.yml의 DB 타도록
 @JdbcTest
 class JdbcUserDaoTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private DataSource dataSource;
-
     private JdbcUserDao jdbcUserDao;
 
     @BeforeEach
     void setUp() {
-        jdbcUserDao = new JdbcUserDao(jdbcTemplate, dataSource);
+        jdbcUserDao = new JdbcUserDao(jdbcTemplate);
         jdbcUserDao.add(new User("existent", "존재", "password"));
     }
 

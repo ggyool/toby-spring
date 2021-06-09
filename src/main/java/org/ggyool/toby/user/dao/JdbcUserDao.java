@@ -1,6 +1,5 @@
 package org.ggyool.toby.user.dao;
 
-import javax.sql.DataSource;
 import org.ggyool.toby.user.domain.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,19 +9,16 @@ import org.springframework.stereotype.Repository;
 public class JdbcUserDao {
 
     private final JdbcTemplate jdbcTemplate;
-    private final DataSource dataSource;
-    ;
 
-    private RowMapper<User> rowMapper = (rs, rowNum) ->
+    private final RowMapper<User> rowMapper = (rs, rowNum) ->
         new User(
             rs.getString("id"),
             rs.getString("name"),
             rs.getString("password")
         );
 
-    public JdbcUserDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+    public JdbcUserDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.dataSource = dataSource;
     }
 
     public User get(String id) {

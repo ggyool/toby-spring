@@ -4,20 +4,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.sql.DataSource;
+import org.ggyool.toby.datasource.MyDataSource;
 import org.ggyool.toby.user.domain.User;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public class UserDao {
 
-    private DataSource dataSource;
+    private final MyDataSource dataSource;
 
-    public UserDao(DataSource dataSource) {
+    public UserDao(MyDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public User get(String id) throws SQLException {
+    public User get(String id) throws SQLException, ClassNotFoundException {
         final String sql = "SELECT * FROM USERS WHERE id = ?";
 
         try (
@@ -33,7 +31,7 @@ public class UserDao {
         }
     }
 
-    public void add(User user) throws SQLException {
+    public void add(User user) throws SQLException, ClassNotFoundException {
         final String sql = "INSERT INTO USERS(id, name, password) VALUES (?, ?, ?)";
 
         try (
