@@ -28,7 +28,8 @@ class JdbcUserDaoTest {
 
     @BeforeEach
     void setUp() {
-        jdbcUserDao = new JdbcUserDao(jdbcTemplate);
+        DaoFactory daoFactory = new DaoFactory();
+        jdbcUserDao = daoFactory.createJdbcUserDao(jdbcTemplate);
         jdbcUserDao.add(new User("existent", "존재", "password"));
     }
 

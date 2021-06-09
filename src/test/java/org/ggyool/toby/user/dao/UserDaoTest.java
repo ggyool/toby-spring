@@ -20,7 +20,8 @@ class UserDaoTest {
 
     @BeforeEach
     void setUp() throws SQLException, ClassNotFoundException {
-        userDao = new UserDao(new H2DataSource());
+        DaoFactory daoFactory = new DaoFactory();
+        userDao = daoFactory.createUserDao();
         userDao.add(new User("existent", "존재", "password"));
     }
 
