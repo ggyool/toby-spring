@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.ggyool.toby.datasource.MyDataSource;
+import org.ggyool.toby.mydatasource.MyDataSource;
 import org.ggyool.toby.user.domain.User;
 
 public class UserDao {

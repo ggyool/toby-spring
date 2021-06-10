@@ -1,4 +1,4 @@
-package org.ggyool.toby.datasource;
+package org.ggyool.toby.mydatasource;
 
 import java.sql.Connection;
 import java.sql.SQLException;

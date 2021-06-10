@@ -2,6 +2,7 @@ package org.ggyool.toby.user.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import javax.sql.DataSource;
 import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +13,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 
-@EnableAutoConfiguration
-@Transactional
+
+//@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+//@AutoConfigureTestDatabase(replace = Replace.NONE)
+
+@Transactional // JdbcTemplate 사용해서 먹힌다고 추측
+@EnableAutoConfiguration // application.yml DataSource 등록하도록
 @SpringBootTest(classes = {DaoFactory.class})
 class JdbcUserDaoTest {
 

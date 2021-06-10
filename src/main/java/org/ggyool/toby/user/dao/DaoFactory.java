@@ -1,8 +1,8 @@
 package org.ggyool.toby.user.dao;
 
 import javax.sql.DataSource;
-import org.ggyool.toby.datasource.H2DataSource;
-import org.ggyool.toby.datasource.MyDataSource;
+import org.ggyool.toby.mydatasource.MyDataSource;
+import org.ggyool.toby.mydatasource.MyH2DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,13 +11,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class DaoFactory {
 
     @Bean
-    public UserDao userDao(MyDataSource myDataSource) {
-        return new UserDao(myDataSource);
+    public UserDao userDao() {
+        return new UserDao(myH2DataSource());
     }
 
     @Bean
-    public MyDataSource h2DataSource() {
-        return new H2DataSource();
+    public MyDataSource myH2DataSource() {
+        return new MyH2DataSource();
     }
 
     @Bean
