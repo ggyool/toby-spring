@@ -7,29 +7,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-/*
-별다른 설정 없이도 메서드 단위로 롤백이 된다.
-JdbcTemplate을 사용할 때에만 그렇다는 생각을 하고 있음.
-쌩 JDBC API를 사용한 UserDaoTest의 경우 롤백되지 않는다.
- */
-@AutoConfigureTestDatabase(replace = Replace.NONE) // application.yml의 DB 타도록
-@JdbcTest
+
+@EnableAutoConfiguration
+@Transactional
+@SpringBootTest(classes = {DaoFactory.class})
 class JdbcUserDaoTest {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-
     private JdbcUserDao jdbcUserDao;
 
     @BeforeEach
     void setUp() {
-        DaoFactory daoFactory = new DaoFactory();
-        jdbcUserDao = daoFactory.createJdbcUserDao(jdbcTemplate);
         jdbcUserDao.add(new User("existent", "존재", "password"));
     }
 

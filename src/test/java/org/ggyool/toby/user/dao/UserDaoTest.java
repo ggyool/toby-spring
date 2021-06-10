@@ -3,11 +3,11 @@ package org.ggyool.toby.user.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.SQLException;
-import org.ggyool.toby.datasource.H2DataSource;
 import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -16,12 +16,11 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 @SpringBootTest
 class UserDaoTest {
 
+    @Autowired
     private UserDao userDao;
 
     @BeforeEach
     void setUp() throws SQLException, ClassNotFoundException {
-        DaoFactory daoFactory = new DaoFactory();
-        userDao = daoFactory.createUserDao();
         userDao.add(new User("existent", "존재", "password"));
     }
 

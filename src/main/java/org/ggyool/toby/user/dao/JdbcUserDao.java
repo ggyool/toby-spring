@@ -3,9 +3,7 @@ package org.ggyool.toby.user.dao;
 import org.ggyool.toby.user.domain.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public class JdbcUserDao {
 
     private final JdbcTemplate jdbcTemplate;
