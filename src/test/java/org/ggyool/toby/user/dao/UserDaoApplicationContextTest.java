@@ -8,29 +8,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+/*
+Docker MySql DataSource 사용해서 테스트 해보고 닫아두었음.
+ */
 @Disabled
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@EnableAutoConfiguration // 꼭 있어야 application.yml에서 꼭 DB를 생성하고 이용해야 하는듯
-@SpringBootTest(classes = {DaoFactory.class})
-class UserDaoTest {
+public class UserDaoApplicationContextTest {
 
-    @Autowired
     private UserDao userDao;
 
     @BeforeEach
-    void setUp() throws SQLException, ClassNotFoundException {
-        userDao.add(new User("existent", "존재", "password"));
+    void setUp() {
+        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(DaoFactory.class);
+        userDao = applicationContext.getBean("userDao", UserDao.class);
     }
 
     @DisplayName("유저 조회")
     @Test
     void get() throws SQLException, ClassNotFoundException {
+        // given
+        userDao.add(new User("existent", "존재", "password"));
+
         // when
         User findUser = userDao.get("existent");
 

@@ -1,11 +1,10 @@
 package org.ggyool.toby.user.dao;
 
-import javax.sql.DataSource;
 import org.ggyool.toby.mydatasource.MyDataSource;
+import org.ggyool.toby.mydatasource.MyDockerMySqlDataSource;
 import org.ggyool.toby.mydatasource.MyH2DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 public class DaoFactory {
@@ -21,12 +20,7 @@ public class DaoFactory {
     }
 
     @Bean
-    public JdbcUserDao jdbcUserDao(JdbcTemplate jdbcTemplate) {
-        return new JdbcUserDao(jdbcTemplate);
-    }
-
-    @Bean
-    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
+    public MyDataSource myDockerMySqlDataSource() {
+        return new MyDockerMySqlDataSource();
     }
 }
