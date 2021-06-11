@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.SQLException;
 import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
-@Disabled
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @EnableAutoConfiguration // 꼭 있어야 application.yml에서 꼭 DB를 생성하고 이용해야 하는듯
 @SpringBootTest(classes = {DaoFactory.class})
