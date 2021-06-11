@@ -5,16 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.SQLException;
 import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-/*
-Docker MySql DataSource 사용해서 테스트 해보고 닫아두었음.
- */
-@Disabled
 public class UserDaoAnnotationConfigTest {
 
     private UserDao userDao;
@@ -36,6 +31,9 @@ public class UserDaoAnnotationConfigTest {
 
         // then
         assertThat(findUser.getId()).isEqualTo("existent");
+
+        // after
+        userDao.deleteById("existent");
     }
 
     @DisplayName("유저 추가")
@@ -50,5 +48,8 @@ public class UserDaoAnnotationConfigTest {
 
         // then
         assertThat(findUser.getId()).isEqualTo("ggyool");
+
+        // after
+        userDao.deleteById("ggyool");
     }
 }

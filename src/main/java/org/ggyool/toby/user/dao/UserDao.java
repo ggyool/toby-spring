@@ -4,22 +4,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.ggyool.toby.mydatasource.MyDataSource;
-import org.ggyool.toby.mydatasource.MyDataSourceCounter;
+import javax.sql.DataSource;
 import org.ggyool.toby.user.domain.User;
 
 public class UserDao {
 
-    private MyDataSource dataSource;
+    private DataSource dataSource;
 
     public UserDao() {
     }
 
-    public UserDao(MyDataSource dataSource) {
+    public UserDao(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public User get(String id) throws SQLException, ClassNotFoundException {
+    public User get(String id) throws SQLException {
         final String sql = "SELECT * FROM USERS WHERE id = ?";
 
         try (
@@ -35,7 +34,7 @@ public class UserDao {
         }
     }
 
-    public void add(User user) throws SQLException, ClassNotFoundException {
+    public void add(User user) throws SQLException {
         final String sql = "INSERT INTO USERS(id, name, password) VALUES (?, ?, ?)";
 
         try (
@@ -49,7 +48,19 @@ public class UserDao {
         }
     }
 
-    public void setDataSourceCounter(MyDataSourceCounter dataSourceCounter) {
-        this.dataSource = dataSourceCounter;
+    public void deleteById(String id) throws SQLException {
+        final String sql = "DELETE FROM USERS WHERE id = ?";
+
+        try (
+            Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setString(1, id);
+            ps.executeUpdate();
+        }
+    }
+
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 }

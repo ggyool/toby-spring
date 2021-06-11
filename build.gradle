@@ -22,7 +22,7 @@ dependencies {
 
 	// DB
 	implementation 'mysql:mysql-connector-java'
-	runtimeOnly 'com.h2database:h2'
+	implementation'com.h2database:h2'
 }
 
 test {

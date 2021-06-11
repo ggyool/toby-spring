@@ -3,14 +3,15 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="myDockerMySqlDataSource" class="org.ggyool.toby.mydatasource.MyDockerMySqlDataSource" />
-  <bean id="myH2DataSource" class="org.ggyool.toby.mydatasource.MyH2DataSource" />
-  <bean id="myDataSourceCounter" class="org.ggyool.toby.mydatasource.MyDataSourceCounter">
-    <property name="dataSource" ref="myDockerMySqlDataSource" />
+  <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+    <property name="driverClass" value="com.mysql.cj.jdbc.Driver" />
+    <property name="url" value="jdbc:mysql://localhost:13306/toby_db?userSSL=false&amp;serverTimezone=Asia/Seoul&amp;characterEncoding=UTF-8" />
+    <property name="username" value="root" />
+    <property name="password" value="root" />
   </bean>
 
   <bean id="userDao" class="org.ggyool.toby.user.dao.UserDao">
-    <property name="dataSourceCounter" ref="myDataSourceCounter" />
+    <property name="dataSource" ref="dataSource" />
   </bean>
 
 </beans>

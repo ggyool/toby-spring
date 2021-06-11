@@ -9,7 +9,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 public class H2DataSource {
 
     private static final String H2_DRIVER_NAME = "org.h2.Driver";
-    private static final String H2_URL = "jdbc:h2:mem:ee";
+    private static final String H2_URL = "jdbc:h2:mem:testdb";
     private static final String USER_NAME = "sa";
     private static final String PASSWORD = "";
 
