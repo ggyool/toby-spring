@@ -1,21 +1,18 @@
 package org.ggyool.toby.user.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.SQLException;
 import org.ggyool.toby.user.domain.User;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.dao.EmptyResultDataAccessException;
 
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-
-//@EnableAutoConfiguration // 꼭 있어야 application.yml에서 꼭 DB를 생성하고 이용해야 하는듯
+// @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(classes = {DaoFactory.class})
 class UserDaoTest {
 
@@ -24,38 +21,42 @@ class UserDaoTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        userDao.add(new User("existent", "존재", "password"));
+        userDao.deleteAll();
     }
 
-    @AfterEach
-    void setDown() throws SQLException {
-        userDao.deleteById("existent");
-    }
-
-    @DisplayName("유저 조회")
+    @DisplayName("유저 추가 및 조회")
     @Test
-    void get() throws SQLException {
-        // when
-        User findUser = userDao.get("existent");
+    void addAndGet() throws SQLException {
+        assertThat(userDao.getCount()).isEqualTo(0);
 
-        // then
-        assertThat(findUser.getId()).isEqualTo("existent");
+        userDao.add(new User("ggyool", "뀰", "password"));
+        assertThat(userDao.getCount()).isEqualTo(1);
+
+        User foundUser = userDao.get("ggyool");
+        assertThat(foundUser.getId()).isEqualTo("ggyool");
+        assertThat(foundUser.getName()).isEqualTo("뀰");
+        assertThat(foundUser.getPassword()).isEqualTo("password");
     }
 
-    @DisplayName("유저 추가")
+    @DisplayName("없는 User를 조회하면 예외발생")
+    @Test()
+    void getFailBecauseNonexistentId() {
+        assertThatThrownBy(() -> userDao.get("nonexistent"))
+            .isInstanceOf(EmptyResultDataAccessException.class);
+    }
+
+    @DisplayName("User가 몇 명인는지 확인")
     @Test
-    void add() throws SQLException {
-        // given
-        User user = new User("ggyool", "뀰", "password");
-        userDao.add(user);
+    void getCount() throws SQLException {
+        assertThat(userDao.getCount()).isEqualTo(0);
 
-        // when
-        User findUser = userDao.get(user.getId());
+        userDao.add(new User("aaa", "에이", "apswd"));
+        assertThat(userDao.getCount()).isEqualTo(1);
 
-        // then
-        assertThat(findUser.getId()).isEqualTo("ggyool");
+        userDao.add(new User("bbb", "비", "bpswd"));
+        assertThat(userDao.getCount()).isEqualTo(2);
 
-        // after
-        userDao.deleteById(findUser.getId());
+        userDao.add(new User("ccc", "씨", "cpswd"));
+        assertThat(userDao.getCount()).isEqualTo(3);
     }
 }
