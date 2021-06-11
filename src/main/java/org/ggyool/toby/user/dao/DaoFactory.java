@@ -12,11 +12,11 @@ public class DaoFactory {
 
     @Bean
     public UserDao userDao() {
-        return new UserDao(myDataSourceMaker());
+        return new UserDao(myDataSourceCounter());
     }
 
     @Bean
-    public MyDataSource myDataSourceMaker() {
+    public MyDataSource myDataSourceCounter() {
         return new MyDataSourceCounter(myH2DataSource());
     }
 

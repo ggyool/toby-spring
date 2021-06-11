@@ -15,7 +15,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 Docker MySql DataSource 사용해서 테스트 해보고 닫아두었음.
  */
 @Disabled
-public class UserDaoApplicationContextTest {
+public class UserDaoAnnotationConfigTest {
 
     private UserDao userDao;
 

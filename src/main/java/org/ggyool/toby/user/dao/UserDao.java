@@ -5,11 +5,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.ggyool.toby.mydatasource.MyDataSource;
+import org.ggyool.toby.mydatasource.MyDataSourceCounter;
 import org.ggyool.toby.user.domain.User;
 
 public class UserDao {
 
-    private final MyDataSource dataSource;
+    private MyDataSource dataSource;
+
+    public UserDao() {
+    }
 
     public UserDao(MyDataSource dataSource) {
         this.dataSource = dataSource;
@@ -43,5 +47,9 @@ public class UserDao {
             ps.setString(3, user.getPassword());
             ps.executeUpdate();
         }
+    }
+
+    public void setDataSourceCounter(MyDataSourceCounter dataSourceCounter) {
+        this.dataSource = dataSourceCounter;
     }
 }
