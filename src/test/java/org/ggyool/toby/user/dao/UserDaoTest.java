@@ -8,12 +8,16 @@ import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-// @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest(classes = {DaoFactory.class})
+//@DirtiesContext()
+//@SpringBootTest(classes = {DaoFactory.class})
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = DaoFactory.class)
 class UserDaoTest {
 
     @Autowired
@@ -45,7 +49,7 @@ class UserDaoTest {
             .isInstanceOf(EmptyResultDataAccessException.class);
     }
 
-    @DisplayName("User가 몇 명인는지 확인")
+    @DisplayName("User가 몇 명 있는지 확인")
     @Test
     void getCount() throws SQLException {
         assertThat(userDao.getCount()).isEqualTo(0);

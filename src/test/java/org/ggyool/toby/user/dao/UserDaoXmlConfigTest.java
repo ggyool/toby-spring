@@ -4,23 +4,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.SQLException;
 import org.ggyool.toby.user.domain.User;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = "/applicationContext.xml")
 public class UserDaoXmlConfigTest {
 
+    @Autowired
     private UserDao userDao;
-
-    @BeforeEach
-    void setUp() {
-        ApplicationContext applicationContext = new GenericXmlApplicationContext("applicationContext.xml");
-        userDao = applicationContext.getBean("userDao", UserDao.class);
-    }
 
     @DisplayName("유저 조회")
     @Test
