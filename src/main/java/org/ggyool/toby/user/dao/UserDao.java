@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import org.ggyool.toby.user.dao.statementstrategy.DeleteAllStrategy;
 import org.ggyool.toby.user.dao.statementstrategy.StatementStrategy;
 import org.ggyool.toby.user.domain.User;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -57,7 +56,7 @@ public class UserDao {
     }
 
     public void add(User user) throws SQLException {
-        class AddStrategy implements StatementStrategy {
+        jdbcContextWithStatementStrategy(new StatementStrategy() {
             @Override
             public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
                 PreparedStatement ps = c.prepareStatement("INSERT INTO USERS(id, name, password) VALUES (?, ?, ?)");
@@ -66,12 +65,16 @@ public class UserDao {
                 ps.setString(3, user.getPassword());
                 return ps;
             }
-        }
-        jdbcContextWithStatementStrategy(new AddStrategy());
+        });
     }
 
     public void deleteAll() throws SQLException {
-        jdbcContextWithStatementStrategy(new DeleteAllStrategy());
+        jdbcContextWithStatementStrategy(new StatementStrategy() {
+            @Override
+            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                return c.prepareStatement("DELETE FROM USERS");
+            }
+        });
     }
 
     public void jdbcContextWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
