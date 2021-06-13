@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+import org.ggyool.toby.user.dao.statementstrategy.DeleteAllStrategy;
+import org.ggyool.toby.user.dao.statementstrategy.StatementStrategy;
 import org.ggyool.toby.user.domain.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 
@@ -69,11 +71,13 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException {
-        final String sql = "DELETE FROM USERS";
+        jdbcContextWithStatementStrategy(new DeleteAllStrategy());
+    }
 
+    public void jdbcContextWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
         try (
             Connection conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
+            PreparedStatement ps = statementStrategy.makePreparedStatement(conn);
         ) {
             ps.executeUpdate();
         }
