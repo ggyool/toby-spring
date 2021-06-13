@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+import org.ggyool.toby.user.dao.statementstrategy.AddStrategy;
 import org.ggyool.toby.user.dao.statementstrategy.DeleteAllStrategy;
 import org.ggyool.toby.user.dao.statementstrategy.StatementStrategy;
 import org.ggyool.toby.user.domain.User;
@@ -57,17 +58,7 @@ public class UserDao {
     }
 
     public void add(User user) throws SQLException {
-        final String sql = "INSERT INTO USERS(id, name, password) VALUES (?, ?, ?)";
-
-        try (
-            Connection conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
-            ps.setString(1, user.getId());
-            ps.setString(2, user.getName());
-            ps.setString(3, user.getPassword());
-            ps.executeUpdate();
-        }
+        jdbcContextWithStatementStrategy(new AddStrategy(user));
     }
 
     public void deleteAll() throws SQLException {
