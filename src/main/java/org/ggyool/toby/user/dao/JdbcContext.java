@@ -15,13 +15,22 @@ public class JdbcContext {
         this.dataSource = dataSource;
     }
 
-    public void executeSql(String sql) throws SQLException {
+    public void executeSql(String sql, String... args) throws SQLException {
         workWithStatementStrategy(new StatementStrategy() {
             @Override
             public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                return c.prepareStatement(sql);
+                PreparedStatement ps = c.prepareStatement(sql);
+                fillArguments(ps, args);
+                return ps;
             }
         });
+    }
+
+    private void fillArguments(PreparedStatement ps, String[] args) throws SQLException {
+        int i = 1;
+        for (String arg : args) {
+            ps.setString(i++, arg);
+        }
     }
 
     public void workWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
