@@ -71,12 +71,7 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException {
-        jdbcContext.workWithStatementStrategy(new StatementStrategy() {
-            @Override
-            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                return c.prepareStatement("DELETE FROM USERS");
-            }
-        });
+        jdbcContext.executeSql("DELETE FROM USERS");
     }
 
     public void deleteById(String id) throws SQLException {
