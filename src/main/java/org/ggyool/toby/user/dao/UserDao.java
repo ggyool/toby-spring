@@ -12,12 +12,14 @@ import org.springframework.dao.EmptyResultDataAccessException;
 public class UserDao {
 
     private DataSource dataSource;
+    private JdbcContext jdbcContext;
 
     public UserDao() {
     }
 
     public UserDao(DataSource dataSource) {
         this.dataSource = dataSource;
+        this.jdbcContext = new JdbcContext(dataSource);
     }
 
     public User get(String id) throws SQLException {
@@ -56,7 +58,7 @@ public class UserDao {
     }
 
     public void add(User user) throws SQLException {
-        jdbcContextWithStatementStrategy(new StatementStrategy() {
+        jdbcContext.workWithStatementStrategy(new StatementStrategy() {
             @Override
             public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
                 PreparedStatement ps = c.prepareStatement("INSERT INTO USERS(id, name, password) VALUES (?, ?, ?)");
@@ -69,21 +71,12 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException {
-        jdbcContextWithStatementStrategy(new StatementStrategy() {
+        jdbcContext.workWithStatementStrategy(new StatementStrategy() {
             @Override
             public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
                 return c.prepareStatement("DELETE FROM USERS");
             }
         });
-    }
-
-    public void jdbcContextWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
-        try (
-            Connection conn = dataSource.getConnection();
-            PreparedStatement ps = statementStrategy.makePreparedStatement(conn);
-        ) {
-            ps.executeUpdate();
-        }
     }
 
     public void deleteById(String id) throws SQLException {
@@ -100,5 +93,9 @@ public class UserDao {
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public void setJdbcContext(JdbcContext jdbcContext) {
+        this.jdbcContext = jdbcContext;
     }
 }
