@@ -2,20 +2,17 @@ package org.ggyool.toby.user.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.sql.SQLException;
 import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-//@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-//@AutoConfigureTestDatabase(replace = Replace.NONE)
-
-@Transactional // JdbcTemplate 사용해서 먹힌다고 추측
-@EnableAutoConfiguration // application.yml DataSource 등록하도록
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {JdbcDaoFactory.class})
 class JdbcUserDaoTest {
 
@@ -23,13 +20,14 @@ class JdbcUserDaoTest {
     private JdbcUserDao jdbcUserDao;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
+        jdbcUserDao.deleteAll();
         jdbcUserDao.add(new User("existent", "존재", "password"));
     }
 
     @DisplayName("유저 조회")
     @Test
-    void get() {
+    void get() throws SQLException {
         // when
         User findUser = jdbcUserDao.get("existent");
 
@@ -39,7 +37,7 @@ class JdbcUserDaoTest {
 
     @DisplayName("유저 추가")
     @Test
-    void add() {
+    void add() throws SQLException {
         // given
         User user = new User("ggyool", "뀰", "password");
         jdbcUserDao.add(user);

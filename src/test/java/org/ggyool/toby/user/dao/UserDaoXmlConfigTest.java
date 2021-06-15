@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.SQLException;
 import org.ggyool.toby.user.domain.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,11 @@ public class UserDaoXmlConfigTest {
     @Autowired
     private UserDao userDao;
 
+    @BeforeEach
+    void setUp() {
+        userDao.deleteAll();
+    }
+
     @DisplayName("유저 조회")
     @Test
     void get() throws SQLException, ClassNotFoundException {
@@ -29,9 +35,6 @@ public class UserDaoXmlConfigTest {
 
         // then
         assertThat(findUser.getId()).isEqualTo("existent");
-
-        // after
-        userDao.deleteById("existent");
     }
 
     @DisplayName("유저 추가")
@@ -46,8 +49,5 @@ public class UserDaoXmlConfigTest {
 
         // then
         assertThat(findUser.getId()).isEqualTo("ggyool");
-
-        // after
-        userDao.deleteById("ggyool");
     }
 }

@@ -2,8 +2,10 @@ package org.ggyool.toby.user.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+import org.ggyool.toby.user.dao.resultsetstrategy.ResultSetStrategy;
 import org.ggyool.toby.user.dao.statementstrategy.StatementStrategy;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
@@ -16,14 +18,24 @@ public class JdbcContext {
     }
 
     public void executeSql(String sql, String... args) throws SQLException {
-        workWithStatementStrategy(new StatementStrategy() {
-            @Override
-            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                PreparedStatement ps = c.prepareStatement(sql);
+        workWithStatementStrategy(
+            con -> {
+                PreparedStatement ps = con.prepareStatement(sql);
                 fillArguments(ps, args);
                 return ps;
             }
-        });
+        );
+    }
+
+    public <T> T executeSqlForObject(String sql, ResultSetStrategy<T> resultSetStrategy, String... args)
+        throws SQLException {
+
+        StatementStrategy statementStrategy = (con) -> {
+            PreparedStatement ps = con.prepareStatement(sql);
+            fillArguments(ps, args);
+            return ps;
+        };
+        return workWithStatementAndResultSetStrategy(statementStrategy, resultSetStrategy);
     }
 
     private void fillArguments(PreparedStatement ps, String[] args) throws SQLException {
@@ -33,12 +45,25 @@ public class JdbcContext {
         }
     }
 
-    public void workWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
+    private void workWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
         try (
             Connection conn = dataSource.getConnection();
             PreparedStatement ps = statementStrategy.makePreparedStatement(conn);
         ) {
             ps.executeUpdate();
+        }
+    }
+
+    private <T> T workWithStatementAndResultSetStrategy(StatementStrategy statementStrategy,
+        ResultSetStrategy<T> resultSetStrategy) throws SQLException {
+
+        try (
+            Connection conn = dataSource.getConnection();
+            PreparedStatement ps = statementStrategy.makePreparedStatement(conn);
+            ResultSet resultSet = ps.executeQuery();
+        ) {
+            resultSet.next();
+            return resultSetStrategy.makeObject(resultSet);
         }
     }
 
