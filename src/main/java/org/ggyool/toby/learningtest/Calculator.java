@@ -7,22 +7,34 @@ import java.util.Objects;
 
 public class Calculator {
 
-    public int calcSum(String path) throws IOException {
-        return calculateContext(path, 0, (line, value) -> value + Integer.parseInt(line));
+    public Integer calcIntegerSum(String path) throws IOException {
+        LineCallback<Integer> lineCallback = (line, value) -> value + Integer.parseInt(line);
+        return calculateContext(path, 0, lineCallback);
     }
 
-    public int calcProduct(String path) throws IOException {
-        return calculateContext(path, 1, (line, value) -> value * Integer.parseInt(line));
+    public Double calcDoubleSum(String path) throws IOException {
+        LineCallback<Double> lineCallback = (line, value) -> value + Double.parseDouble(line);
+        return calculateContext(path, 0.0, lineCallback);
     }
 
-    private int calculateContext(String path, int initialValue, LineCallback lineCallback) throws IOException {
+    public String concatenate(String path) throws IOException {
+        LineCallback<String> lineCallback = (line, value) -> line + value;
+        return calculateContext(path, "", lineCallback);
+    }
+
+    public Integer calcProduct(String path) throws IOException {
+        LineCallback<Integer> lineCallback = (line, value) -> value * Integer.parseInt(line);
+        return calculateContext(path, 1, lineCallback);
+    }
+
+    private <T> T calculateContext(String path, T initialValue, LineCallback<T> lineCallback) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(path));
         String line = br.readLine();
         if (Objects.isNull(line)) {
-            return 0;
+            return null;
         }
         try {
-            int res = initialValue;
+            T res = initialValue;
             while (Objects.nonNull(line)) {
                 res = lineCallback.run(line, res);
                 line = br.readLine();

@@ -1,5 +1,6 @@
 package org.ggyool.toby.learningtest;
 
-public interface LineCallback {
-    int run(String line, int initialValue);
+public interface LineCallback<T> {
+
+    T run(String line, T value);
 }
