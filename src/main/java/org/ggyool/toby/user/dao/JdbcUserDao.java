@@ -1,8 +1,10 @@
 package org.ggyool.toby.user.dao;
 
+import com.mysql.cj.exceptions.MysqlErrorNumbers;
 import java.sql.SQLException;
 import org.ggyool.toby.user.dao.resultsetstrategy.ResultSetStrategy;
 import org.ggyool.toby.user.domain.User;
+import org.ggyool.toby.user.exception.DuplicateUserIdException;
 
 public class JdbcUserDao {
 
@@ -25,9 +27,18 @@ public class JdbcUserDao {
         return jdbcContext.executeSqlForObject(sql, resultSetStrategy, id);
     }
 
-    public void add(User user) throws SQLException {
+    public void add(User user) throws Throwable {
         final String sql = "INSERT INTO USERS(id, name, password) VALUES (?, ?, ?)";
-        jdbcContext.executeSql(sql, user.getId(), user.getName(), user.getPassword());
+        try {
+            jdbcContext.executeSql(sql, user.getId(), user.getName(), user.getPassword());
+        } catch (SQLException e) {
+            if (e.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
+                throw new DuplicateUserIdException(user.getId())
+                    .initCause(e);
+            } else {
+                throw e;
+            }
+        }
     }
 
     public void deleteAll() throws SQLException {

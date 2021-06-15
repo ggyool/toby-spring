@@ -1,9 +1,11 @@
 package org.ggyool.toby.user.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.SQLException;
 import org.ggyool.toby.user.domain.User;
+import org.ggyool.toby.user.exception.DuplicateUserIdException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +22,7 @@ class JdbcUserDaoTest {
     private JdbcUserDao jdbcUserDao;
 
     @BeforeEach
-    void setUp() throws SQLException {
+    void setUp() throws Throwable {
         jdbcUserDao.deleteAll();
         jdbcUserDao.add(new User("existent", "존재", "password"));
     }
@@ -37,7 +39,7 @@ class JdbcUserDaoTest {
 
     @DisplayName("유저 추가")
     @Test
-    void add() throws SQLException {
+    void add() throws Throwable {
         // given
         User user = new User("ggyool", "뀰", "password");
         jdbcUserDao.add(user);
@@ -47,5 +49,18 @@ class JdbcUserDaoTest {
 
         // then
         assertThat(findUser.getId()).isEqualTo("ggyool");
+    }
+
+    @DisplayName("예외 - 중복 유저 추가")
+    @Test
+    void add_negativeCase_existentId() {
+        // when, then
+        assertThatThrownBy(() -> jdbcUserDao.add(new User("existent", "새로운유저", "password")))
+            .isInstanceOf(DuplicateUserIdException.class);
+    }
+
+    @Test
+    void test() throws Throwable {
+        jdbcUserDao.add(new User("existent", "새로운유저", "password"));
     }
 }
