@@ -8,35 +8,26 @@ import java.util.Objects;
 public class Calculator {
 
     public int calcSum(String path) throws IOException {
-        return calculateContext(path, (br) -> {
-            int sum = 0;
-            String line;
-            while (Objects.nonNull(line = br.readLine())) {
-                sum += Integer.parseInt(line);
-            }
-            return sum;
-        });
+        return calculateContext(path, 0, (line, value) -> value + Integer.parseInt(line));
     }
 
     public int calcProduct(String path) throws IOException {
-        return calculateContext(path, (br) -> {
-            String line = line = br.readLine();
-            if (Objects.isNull(line)) {
-                return 0;
-            }
-            int res = 1;
+        return calculateContext(path, 1, (line, value) -> value * Integer.parseInt(line));
+    }
+
+    private int calculateContext(String path, int initialValue, LineCallback lineCallback) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(path));
+        String line = br.readLine();
+        if (Objects.isNull(line)) {
+            return 0;
+        }
+        try {
+            int res = initialValue;
             while (Objects.nonNull(line)) {
-                res *= Integer.parseInt(line);
+                res = lineCallback.run(line, res);
                 line = br.readLine();
             }
             return res;
-        });
-    }
-
-    private int calculateContext(String path, CalculateStrategy calculateStrategy) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(path));
-        try {
-            return calculateStrategy.run(br);
         } finally {
             if (br != null) {
                 br.close();

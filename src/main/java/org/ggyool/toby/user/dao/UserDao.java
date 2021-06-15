@@ -62,16 +62,6 @@ public class UserDao {
             "INSERT INTO USERS(id, name, password) VALUES (?, ?, ?)",
             user.getId(), user.getName(), user.getPassword()
         );
-//        jdbcContext.workWithStatementStrategy(new StatementStrategy() {
-//            @Override
-//            public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-//                PreparedStatement ps = c.prepareStatement("INSERT INTO USERS(id, name, password) VALUES (?, ?, ?)");
-//                ps.setString(1, user.getId());
-//                ps.setString(2, user.getName());
-//                ps.setString(3, user.getPassword());
-//                return ps;
-//            }
-//        });
     }
 
     public void deleteAll() throws SQLException {
