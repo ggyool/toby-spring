@@ -1,90 +1,54 @@
 package org.ggyool.toby.user.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import javax.sql.DataSource;
-import org.ggyool.toby.user.dao.statementstrategy.StatementStrategy;
 import org.ggyool.toby.user.domain.User;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 public class UserDao {
 
-    private DataSource dataSource;
-    private JdbcContext jdbcContext;
+    private JdbcTemplate jdbcTemplate;
 
     public UserDao() {
     }
 
     public UserDao(DataSource dataSource) {
-        this.dataSource = dataSource;
-        this.jdbcContext = new JdbcContext(dataSource);
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public User get(String id) throws SQLException {
+    public User get(String id) {
         final String sql = "SELECT * FROM USERS WHERE id = ?";
-        ResultSet rs = null;
-
-        try (
-            Connection conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-        ) {
-            ps.setString(1, id);
-            rs = ps.executeQuery();
-            if (!rs.next()) {
-                throw new EmptyResultDataAccessException("유저를 조회하는데 실패했습니다.", 1);
-            }
-            User user = new User(rs.getString("id"), rs.getString("name"), rs.getString("password"));
-            return user;
-        } finally {
-            rs.close();
-        }
+        return jdbcTemplate.queryForObject(
+            sql,
+            (rs, rowNum) -> new User(
+                rs.getString("id"),
+                rs.getString("name"),
+                rs.getString("password")
+            ),
+            id);
     }
 
-    public int getCount() throws SQLException {
+    public Integer getCount() {
         final String sql = "SELECT COUNT(*) FROM USERS";
-
-        try (
-            Connection conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-        ) {
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            int count = rs.getInt(1);
-            rs.close();
-            return count;
-        }
+        return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 
-    public void add(User user) throws SQLException {
-        jdbcContext.executeSql(
+    public void add(User user) {
+        jdbcTemplate.update(
             "INSERT INTO USERS(id, name, password) VALUES (?, ?, ?)",
             user.getId(), user.getName(), user.getPassword()
         );
     }
 
-    public void deleteAll() throws SQLException {
-        jdbcContext.executeSql("DELETE FROM USERS");
+    public void deleteAll() {
+        jdbcTemplate.update("DELETE FROM USERS");
     }
 
-    public void deleteById(String id) throws SQLException {
+    public void deleteById(String id) {
         final String sql = "DELETE FROM USERS WHERE id = ?";
-
-        try (
-            Connection conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
-            ps.setString(1, id);
-            ps.executeUpdate();
-        }
+        jdbcTemplate.update(sql, id);
     }
 
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public void setJdbcContext(JdbcContext jdbcContext) {
-        this.jdbcContext = jdbcContext;
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 }

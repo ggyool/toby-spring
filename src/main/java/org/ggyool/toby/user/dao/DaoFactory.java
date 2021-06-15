@@ -1,10 +1,6 @@
 package org.ggyool.toby.user.dao;
 
 import javax.sql.DataSource;
-import org.ggyool.toby.mydatasource.MyDataSource;
-import org.ggyool.toby.mydatasource.MyDataSourceCounter;
-import org.ggyool.toby.mydatasource.MyDockerMySqlDataSource;
-import org.ggyool.toby.mydatasource.MyH2DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
@@ -29,20 +25,5 @@ public class DaoFactory {
         dataSource.setUsername(USER_NAME);
         dataSource.setPassword(PASSWORD);
         return dataSource;
-    }
-
-    @Bean
-    public MyDataSource myDataSourceCounter() {
-        return new MyDataSourceCounter(myH2DataSource());
-    }
-
-    @Bean
-    public MyDataSource myH2DataSource() {
-        return new MyH2DataSource();
-    }
-
-    @Bean
-    public MyDataSource myDockerMySqlDataSource() {
-        return new MyDockerMySqlDataSource();
     }
 }

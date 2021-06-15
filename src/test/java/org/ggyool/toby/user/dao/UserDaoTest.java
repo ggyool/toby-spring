@@ -24,13 +24,13 @@ class UserDaoTest {
     private UserDao userDao;
 
     @BeforeEach
-    void setUp() throws SQLException {
+    void setUp() {
         userDao.deleteAll();
     }
 
     @DisplayName("유저 추가 및 조회")
     @Test
-    void addAndGet() throws SQLException {
+    void addAndGet() {
         assertThat(userDao.getCount()).isEqualTo(0);
 
         userDao.add(new User("ggyool", "뀰", "password"));
@@ -51,7 +51,7 @@ class UserDaoTest {
 
     @DisplayName("User가 몇 명 있는지 확인")
     @Test
-    void getCount() throws SQLException {
+    void getCount() {
         assertThat(userDao.getCount()).isEqualTo(0);
 
         userDao.add(new User("aaa", "에이", "apswd"));
