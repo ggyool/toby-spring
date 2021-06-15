@@ -4,10 +4,16 @@ import java.util.List;
 import javax.sql.DataSource;
 import org.ggyool.toby.user.domain.User;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 public class UserDao {
 
     private JdbcTemplate jdbcTemplate;
+    private RowMapper<User> rowMapper = (rs, rowNum) -> new User(
+        rs.getString("id"),
+        rs.getString("name"),
+        rs.getString("password")
+    );
 
     public UserDao() {
     }
@@ -18,26 +24,12 @@ public class UserDao {
 
     public User get(String id) {
         final String sql = "SELECT * FROM USERS WHERE id = ?";
-        return jdbcTemplate.queryForObject(
-            sql,
-            (rs, rowNum) -> new User(
-                rs.getString("id"),
-                rs.getString("name"),
-                rs.getString("password")
-            ),
-            id);
+        return jdbcTemplate.queryForObject(sql, rowMapper, id);
     }
 
     public List<User> getAllAsc() {
         final String sql = "SELECT * FROM USERS ORDER BY ID";
-        return jdbcTemplate.query(
-            sql,
-            (rs, rowNum) -> new User(
-                rs.getString("id"),
-                rs.getString("name"),
-                rs.getString("password")
-            )
-        );
+        return jdbcTemplate.query(sql, rowMapper);
     }
 
     public Integer getCount() {
