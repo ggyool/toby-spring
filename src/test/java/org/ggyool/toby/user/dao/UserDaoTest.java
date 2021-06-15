@@ -3,7 +3,7 @@ package org.ggyool.toby.user.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.sql.SQLException;
+import java.util.List;
 import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,9 +23,14 @@ class UserDaoTest {
     @Autowired
     private UserDao userDao;
 
+    private User userA, userB, userC;
+
     @BeforeEach
     void setUp() {
         userDao.deleteAll();
+        userA = new User("aaa", "에이", "apswd");
+        userB = new User("bbb", "비", "bpswd");
+        userC = new User("ccc", "씨", "cpswd");
     }
 
     @DisplayName("유저 추가 및 조회")
@@ -54,13 +59,40 @@ class UserDaoTest {
     void getCount() {
         assertThat(userDao.getCount()).isEqualTo(0);
 
-        userDao.add(new User("aaa", "에이", "apswd"));
+        userDao.add(userA);
         assertThat(userDao.getCount()).isEqualTo(1);
 
-        userDao.add(new User("bbb", "비", "bpswd"));
+        userDao.add(userB);
         assertThat(userDao.getCount()).isEqualTo(2);
 
-        userDao.add(new User("ccc", "씨", "cpswd"));
+        userDao.add(userC);
         assertThat(userDao.getCount()).isEqualTo(3);
+    }
+
+    @DisplayName("모든 유저 조회")
+    @Test
+    void getAllAsc() {
+        // given
+        userDao.add(userC);
+        userDao.add(userA);
+        userDao.add(userB);
+
+        // when
+        List<User> users = userDao.getAllAsc();
+
+        // then - equals, hashCode 안 만들고 id만 비교하였음
+        assertThat(users).extracting("id")
+            .containsExactly(
+                userA.getId(),
+                userB.getId(),
+                userC.getId()
+            );
+    }
+
+    @DisplayName("데이터가 없는 경우 모든 유저 조회")
+    @Test
+    void getAllAsc_negativeCase_nonExistentData() {
+        List<User> users = userDao.getAllAsc();
+        assertThat(users).hasSize(0);
     }
 }

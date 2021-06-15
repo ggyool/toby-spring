@@ -1,5 +1,6 @@
 package org.ggyool.toby.user.dao;
 
+import java.util.List;
 import javax.sql.DataSource;
 import org.ggyool.toby.user.domain.User;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,6 +26,18 @@ public class UserDao {
                 rs.getString("password")
             ),
             id);
+    }
+
+    public List<User> getAllAsc() {
+        final String sql = "SELECT * FROM USERS ORDER BY ID";
+        return jdbcTemplate.query(
+            sql,
+            (rs, rowNum) -> new User(
+                rs.getString("id"),
+                rs.getString("name"),
+                rs.getString("password")
+            )
+        );
     }
 
     public Integer getCount() {
