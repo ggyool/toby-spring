@@ -2,6 +2,7 @@ package org.ggyool.toby.user.purejdbcdao;
 
 import java.sql.SQLException;
 import java.util.Objects;
+import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
 import org.ggyool.toby.user.purejdbcdao.resultsetstrategy.ResultSetStrategy;
 import org.springframework.dao.DataAccessException;
@@ -16,7 +17,10 @@ public class PureJdbcUserDao {
         (rs) -> new User(
             rs.getString("id"),
             rs.getString("name"),
-            rs.getString("password")
+            rs.getString("password"),
+            Level.from(rs.getInt("level")),
+            rs.getInt("login"),
+            rs.getInt("recommend")
         );
 
     private final SQLExceptionTranslator sqlTranslator;

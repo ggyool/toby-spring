@@ -68,8 +68,10 @@ class UserDaoTest {
         userDao.add(userA);
 
         // when, then
-        assertThatThrownBy(() -> userDao.add(new User("aaa", "새로운유저", "password")))
-            .isInstanceOf(DuplicateKeyException.class);
+        assertThatThrownBy(() -> userDao.add(
+            new User("aaa", "새로운유저", "password", Level.BASIC, 0, 0)
+            )
+        ).isInstanceOf(DuplicateKeyException.class);
     }
 
     @DisplayName("학습 테스트 - SQLExcception to DataAccessException")

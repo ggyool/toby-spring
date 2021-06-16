@@ -3,6 +3,7 @@ package org.ggyool.toby.user.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.SQLException;
+import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +29,7 @@ public class UserDaoAnnotationConfigTest {
     @Test
     void get() throws SQLException, ClassNotFoundException {
         // given
-        userDao.add(new User("existent", "존재", "password"));
+        userDao.add(new User("existent", "존재", "password", Level.BASIC, 0, 0));
 
         // when
         User findUser = userDao.get("existent");
@@ -41,7 +42,7 @@ public class UserDaoAnnotationConfigTest {
     @Test
     void add() throws SQLException, ClassNotFoundException {
         // given
-        User user = new User("ggyool", "뀰", "password");
+        User user = new User("ggyool", "뀰", "password", Level.BASIC, 0, 0);
         userDao.add(user);
 
         // when

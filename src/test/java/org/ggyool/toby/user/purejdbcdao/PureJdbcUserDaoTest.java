@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.SQLException;
 import javax.sql.DataSource;
+import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -30,7 +31,7 @@ class PureJdbcUserDaoTest {
     @BeforeEach
     void setUp() throws Throwable {
         pureJdbcDao.deleteAll();
-        pureJdbcDao.add(new User("existent", "존재", "password"));
+        pureJdbcDao.add(new User("existent", "존재", "password", Level.BASIC, 0, 0));
     }
 
     @DisplayName("유저 조회")
@@ -47,7 +48,7 @@ class PureJdbcUserDaoTest {
     @Test
     void add() throws Throwable {
         // given
-        User user = new User("ggyool", "뀰", "password");
+        User user = new User("ggyool", "뀰", "password", Level.BASIC, 0, 0);
         pureJdbcDao.add(user);
 
         // when
@@ -61,7 +62,7 @@ class PureJdbcUserDaoTest {
     @Test
     void add_negativeCase_existentId() {
         // when, then
-        assertThatThrownBy(() -> pureJdbcDao.add(new User("existent", "새로운유저", "password")))
+        assertThatThrownBy(() -> pureJdbcDao.add(new User("existent", "새로운유저", "password", Level.BASIC, 0, 0)))
             .isInstanceOf(DuplicateKeyException.class);
     }
 }

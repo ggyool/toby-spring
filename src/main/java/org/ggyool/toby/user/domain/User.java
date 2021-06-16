@@ -12,10 +12,6 @@ public class User {
     public User() {
     }
 
-    public User(String id, String name, String password) {
-        this(id, name, password, Level.BASIC, 0, 0);
-    }
-
     public User(String id, String name, String password, Level level, int login, int recommend) {
         this.id = id;
         this.name = name;
