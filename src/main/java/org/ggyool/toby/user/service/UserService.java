@@ -1,6 +1,7 @@
 package org.ggyool.toby.user.service;
 
 import java.util.List;
+import java.util.Objects;
 import org.ggyool.toby.user.dao.UserDao;
 import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
@@ -10,6 +11,13 @@ public class UserService {
     private UserDao userDao;
 
     public UserService() {
+    }
+
+    public void add(User user) {
+        if (Objects.isNull(user.getLevel())) {
+            user.setLevel(Level.BASIC);
+        }
+        userDao.add(user);
     }
 
     public void upgradeLevels() {
