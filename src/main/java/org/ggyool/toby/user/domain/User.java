@@ -1,5 +1,7 @@
 package org.ggyool.toby.user.domain;
 
+import java.util.Objects;
+
 public class User {
 
     private String id;
@@ -21,20 +23,15 @@ public class User {
         this.recommend = recommend;
     }
 
+    public void upgradeLevel() {
+        Level nextLevel = level.getNext();
+        if (Objects.isNull(nextLevel)) {
+            throw new IllegalStateException("더 이상 등급 업그레이드가 불가능합니다. 현재 등급 : " + level);
+        }
+        level = nextLevel;
+    }
     public int getLevelValue() {
         return level.getValue();
-    }
-
-    public boolean isBasicLevel() {
-        return level.isBasic();
-    }
-
-    public boolean isSilverLevel() {
-        return level.isSilver();
-    }
-
-    public boolean isGoldLevel() {
-        return level.isGold();
     }
 
     public String getId() {

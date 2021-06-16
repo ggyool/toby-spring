@@ -23,23 +23,29 @@ public class UserService {
     public void upgradeLevels() {
         List<User> users = userDao.getAllAsc();
         users.forEach(user -> {
-            upgradeLevel(user);
-            userDao.update(user);
+            if (canUpgradeLevel(user)) {
+                upgradeLevel(user);
+            }
         });
     }
 
+    private boolean canUpgradeLevel(User user) {
+        Level level = user.getLevel();
+        switch (level) {
+            case BASIC:
+                return user.getLogin() >= 50;
+            case SILVER:
+                return user.getRecommend() >= 30;
+            case GOLD:
+                return false;
+            default:
+                throw new IllegalArgumentException("알 수 없는 등급입니다. 등급 : " + level);
+        }
+    }
+
     private void upgradeLevel(User user) {
-        boolean isChanged = false;
-        if (user.isBasicLevel() && user.getLogin() >= 50) {
-            user.setLevel(Level.SILVER);
-            isChanged = true;
-        } else if (user.isSilverLevel() && user.getRecommend() >= 30) {
-            user.setLevel(Level.GOLD);
-            isChanged = true;
-        }
-        if (isChanged) {
-            userDao.update(user);
-        }
+        user.upgradeLevel();
+        userDao.update(user);
     }
 
     public void setUserDao(UserDao userDao) {
