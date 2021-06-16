@@ -29,6 +29,18 @@ public class User {
         return level.getValue();
     }
 
+    public boolean isBasicLevel() {
+        return level.isBasic();
+    }
+
+    public boolean isSilverLevel() {
+        return level.isSilver();
+    }
+
+    public boolean isGoldLevel() {
+        return level.isGold();
+    }
+
     public String getId() {
         return id;
     }

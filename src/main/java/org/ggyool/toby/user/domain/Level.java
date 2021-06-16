@@ -24,4 +24,16 @@ public enum Level {
     public int getValue() {
         return value;
     }
+
+    public boolean isBasic() {
+        return this.equals(BASIC);
+    }
+
+    public boolean isSilver() {
+        return this.equals(SILVER);
+    }
+
+    public boolean isGold() {
+        return this.equals(GOLD);
+    }
 }
