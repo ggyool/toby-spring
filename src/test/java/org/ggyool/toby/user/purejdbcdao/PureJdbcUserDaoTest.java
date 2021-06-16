@@ -1,4 +1,4 @@
-package org.ggyool.toby.user.dao;
+package org.ggyool.toby.user.purejdbcdao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -15,23 +15,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {JdbcDaoFactory.class})
-class JdbcUserDaoTest {
+@SpringBootTest(classes = {PureJdbcDaoFactory.class})
+class PureJdbcUserDaoTest {
 
     @Autowired
-    private JdbcUserDao jdbcUserDao;
+    private PureJdbcUserDao pureJdbcDao;
 
     @BeforeEach
     void setUp() throws Throwable {
-        jdbcUserDao.deleteAll();
-        jdbcUserDao.add(new User("existent", "존재", "password"));
+        pureJdbcDao.deleteAll();
+        pureJdbcDao.add(new User("existent", "존재", "password"));
     }
 
     @DisplayName("유저 조회")
     @Test
     void get() throws SQLException {
         // when
-        User findUser = jdbcUserDao.get("existent");
+        User findUser = pureJdbcDao.get("existent");
 
         // then
         assertThat(findUser.getId()).isEqualTo("existent");
@@ -42,10 +42,10 @@ class JdbcUserDaoTest {
     void add() throws Throwable {
         // given
         User user = new User("ggyool", "뀰", "password");
-        jdbcUserDao.add(user);
+        pureJdbcDao.add(user);
 
         // when
-        User findUser = jdbcUserDao.get(user.getId());
+        User findUser = pureJdbcDao.get(user.getId());
 
         // then
         assertThat(findUser.getId()).isEqualTo("ggyool");
@@ -55,12 +55,7 @@ class JdbcUserDaoTest {
     @Test
     void add_negativeCase_existentId() {
         // when, then
-        assertThatThrownBy(() -> jdbcUserDao.add(new User("existent", "새로운유저", "password")))
+        assertThatThrownBy(() -> pureJdbcDao.add(new User("existent", "새로운유저", "password")))
             .isInstanceOf(DuplicateUserIdException.class);
-    }
-
-    @Test
-    void test() throws Throwable {
-        jdbcUserDao.add(new User("existent", "새로운유저", "password"));
     }
 }

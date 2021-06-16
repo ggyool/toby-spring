@@ -1,4 +1,4 @@
-package org.ggyool.toby.user.dao.resultsetstrategy;
+package org.ggyool.toby.user.purejdbcdao.resultsetstrategy;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

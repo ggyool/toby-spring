@@ -1,4 +1,4 @@
-package org.ggyool.toby.user.dao.statementstrategy;
+package org.ggyool.toby.user.purejdbcdao.statementstrategy;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

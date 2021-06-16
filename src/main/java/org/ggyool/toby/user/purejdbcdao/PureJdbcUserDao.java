@@ -1,12 +1,12 @@
-package org.ggyool.toby.user.dao;
+package org.ggyool.toby.user.purejdbcdao;
 
 import com.mysql.cj.exceptions.MysqlErrorNumbers;
 import java.sql.SQLException;
-import org.ggyool.toby.user.dao.resultsetstrategy.ResultSetStrategy;
 import org.ggyool.toby.user.domain.User;
 import org.ggyool.toby.user.exception.DuplicateUserIdException;
+import org.ggyool.toby.user.purejdbcdao.resultsetstrategy.ResultSetStrategy;
 
-public class JdbcUserDao {
+public class PureJdbcUserDao {
 
     private final JdbcContext jdbcContext;
 
@@ -18,7 +18,7 @@ public class JdbcUserDao {
         );
 
 
-    public JdbcUserDao(JdbcContext jdbcContext) {
+    public PureJdbcUserDao(JdbcContext jdbcContext) {
         this.jdbcContext = jdbcContext;
     }
 

@@ -1,12 +1,12 @@
-package org.ggyool.toby.user.dao;
+package org.ggyool.toby.user.purejdbcdao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import org.ggyool.toby.user.dao.resultsetstrategy.ResultSetStrategy;
-import org.ggyool.toby.user.dao.statementstrategy.StatementStrategy;
+import org.ggyool.toby.user.purejdbcdao.resultsetstrategy.ResultSetStrategy;
+import org.ggyool.toby.user.purejdbcdao.statementstrategy.StatementStrategy;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 public class JdbcContext {

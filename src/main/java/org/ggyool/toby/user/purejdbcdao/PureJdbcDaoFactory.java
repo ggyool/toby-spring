@@ -1,14 +1,14 @@
-package org.ggyool.toby.user.dao;
+package org.ggyool.toby.user.purejdbcdao;
 
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
-public class JdbcDaoFactory {
+public class PureJdbcDaoFactory {
 
     @Bean
-    public JdbcUserDao jdbcUserDao(JdbcContext jdbcContext) {
-        return new JdbcUserDao(jdbcContext);
+    public PureJdbcUserDao jdbcUserDao(JdbcContext jdbcContext) {
+        return new PureJdbcUserDao(jdbcContext);
     }
 
     @Bean
