@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.sql.SQLException;
 import java.util.List;
 import javax.sql.DataSource;
+import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,9 +38,9 @@ class UserDaoTest {
     @BeforeEach
     void setUp() {
         userDao.deleteAll();
-        userA = new User("aaa", "에이", "apswd");
-        userB = new User("bbb", "비", "bpswd");
-        userC = new User("ccc", "씨", "cpswd");
+        userA = new User("aaa", "에이", "apswd", Level.BASIC, 1, 0);
+        userB = new User("bbb", "비", "bpswd", Level.SILVER, 55, 10);
+        userC = new User("ccc", "씨", "cpswd", Level.GOLD, 100, 40);
     }
 
     @DisplayName("유저 추가 및 조회")
@@ -47,13 +48,17 @@ class UserDaoTest {
     void addAndGet() {
         assertThat(userDao.getCount()).isEqualTo(0);
 
-        userDao.add(new User("ggyool", "뀰", "password"));
+        userDao.add(userA);
         assertThat(userDao.getCount()).isEqualTo(1);
+        checkSameValue(userDao.get(userA.getId()), userA);
 
-        User foundUser = userDao.get("ggyool");
-        assertThat(foundUser.getId()).isEqualTo("ggyool");
-        assertThat(foundUser.getName()).isEqualTo("뀰");
-        assertThat(foundUser.getPassword()).isEqualTo("password");
+        userDao.add(userB);
+        assertThat(userDao.getCount()).isEqualTo(2);
+        checkSameValue(userDao.get(userB.getId()), userB);
+
+        userDao.add(userC);
+        assertThat(userDao.getCount()).isEqualTo(3);
+        checkSameValue(userDao.get(userC.getId()), userC);
     }
 
     @DisplayName("예외 - 중복 유저 추가")
@@ -129,5 +134,10 @@ class UserDaoTest {
     void getAllAsc_negativeCase_nonExistentData() {
         List<User> users = userDao.getAllAsc();
         assertThat(users).hasSize(0);
+    }
+
+    private void checkSameValue(User userA, User userB) {
+        assertThat(userA).usingRecursiveComparison()
+            .isEqualTo(userB);
     }
 }

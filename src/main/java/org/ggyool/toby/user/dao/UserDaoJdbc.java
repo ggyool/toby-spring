@@ -2,6 +2,7 @@ package org.ggyool.toby.user.dao;
 
 import java.util.List;
 import javax.sql.DataSource;
+import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,7 +13,10 @@ public class UserDaoJdbc implements UserDao {
     private RowMapper<User> rowMapper = (rs, rowNum) -> new User(
         rs.getString("id"),
         rs.getString("name"),
-        rs.getString("password")
+        rs.getString("password"),
+        Level.from(rs.getInt("level")),
+        rs.getInt("login"),
+        rs.getInt("recommend")
     );
 
     public UserDaoJdbc() {
@@ -39,8 +43,8 @@ public class UserDaoJdbc implements UserDao {
 
     public void add(User user) {
         jdbcTemplate.update(
-            "INSERT INTO USERS(id, name, password) VALUES (?, ?, ?)",
-            user.getId(), user.getName(), user.getPassword()
+            "INSERT INTO USERS(id, name, password, level, login, recommend) VALUES (?, ?, ?, ?, ?, ?)",
+            user.getId(), user.getName(), user.getPassword(), user.getLevelValue(), user.getLogin(), user.getRecommend()
         );
     }
 

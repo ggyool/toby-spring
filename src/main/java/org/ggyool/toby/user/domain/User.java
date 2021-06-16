@@ -25,6 +25,10 @@ public class User {
         this.recommend = recommend;
     }
 
+    public int getLevelValue() {
+        return level.getValue();
+    }
+
     public String getId() {
         return id;
     }
