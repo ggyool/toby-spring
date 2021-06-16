@@ -1,10 +1,12 @@
 package org.ggyool.toby.user.purejdbcdao;
 
-import com.mysql.cj.exceptions.MysqlErrorNumbers;
 import java.sql.SQLException;
+import java.util.Objects;
 import org.ggyool.toby.user.domain.User;
-import org.ggyool.toby.user.exception.DuplicateUserIdException;
 import org.ggyool.toby.user.purejdbcdao.resultsetstrategy.ResultSetStrategy;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLExceptionTranslator;
 
 public class PureJdbcUserDao {
 
@@ -17,9 +19,12 @@ public class PureJdbcUserDao {
             rs.getString("password")
         );
 
+    private final SQLExceptionTranslator sqlTranslator;
+
 
     public PureJdbcUserDao(JdbcContext jdbcContext) {
         this.jdbcContext = jdbcContext;
+        this.sqlTranslator = new SQLErrorCodeSQLExceptionTranslator(jdbcContext.getDataSource());
     }
 
     public User get(String id) throws SQLException {
@@ -29,15 +34,15 @@ public class PureJdbcUserDao {
 
     public void add(User user) throws Throwable {
         final String sql = "INSERT INTO USERS(id, name, password) VALUES (?, ?, ?)";
+
         try {
             jdbcContext.executeSql(sql, user.getId(), user.getName(), user.getPassword());
         } catch (SQLException e) {
-            if (e.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
-                throw new DuplicateUserIdException(user.getId())
-                    .initCause(e);
-            } else {
+            DataAccessException dataAccessException = sqlTranslator.translate(null, null, e);
+            if (Objects.isNull(dataAccessException)) {
                 throw e;
             }
+            throw dataAccessException;
         }
     }
 

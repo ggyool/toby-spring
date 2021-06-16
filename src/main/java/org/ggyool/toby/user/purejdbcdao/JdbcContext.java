@@ -70,4 +70,8 @@ public class JdbcContext {
     public void setDataSource(SimpleDriverDataSource dataSource) {
         this.dataSource = dataSource;
     }
+
+    public DataSource getDataSource() {
+        return dataSource;
+    }
 }
