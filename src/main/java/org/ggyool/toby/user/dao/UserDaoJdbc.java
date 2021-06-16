@@ -2,8 +2,8 @@ package org.ggyool.toby.user.dao;
 
 import java.util.List;
 import javax.sql.DataSource;
-import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
+import org.ggyool.toby.user.domain.level.Level;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 

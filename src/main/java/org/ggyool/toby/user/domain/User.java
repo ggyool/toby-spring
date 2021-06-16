@@ -1,5 +1,8 @@
 package org.ggyool.toby.user.domain;
 
+import org.ggyool.toby.user.domain.level.Level;
+import org.ggyool.toby.user.domain.level.LevelDeterminer;
+
 public class User {
 
     private String id;
@@ -25,20 +28,12 @@ public class User {
         this.recommend = recommend;
     }
 
+    public void upgradeLevel(LevelDeterminer levelDeterminer) {
+        level = levelDeterminer.determine(this);
+    }
+
     public int getLevelValue() {
         return level.getValue();
-    }
-
-    public boolean isBasicLevel() {
-        return level.isBasic();
-    }
-
-    public boolean isSilverLevel() {
-        return level.isSilver();
-    }
-
-    public boolean isGoldLevel() {
-        return level.isGold();
     }
 
     public String getId() {

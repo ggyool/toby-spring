@@ -1,4 +1,4 @@
-package org.ggyool.toby.user.domain;
+package org.ggyool.toby.user.domain.level;
 
 import java.util.Arrays;
 
@@ -8,7 +8,7 @@ public enum Level {
     SILVER(2),
     GOLD(3);
 
-    int value;
+    private final int value;
 
     Level(int value) {
         this.value = value;
@@ -23,17 +23,5 @@ public enum Level {
 
     public int getValue() {
         return value;
-    }
-
-    public boolean isBasic() {
-        return this.equals(BASIC);
-    }
-
-    public boolean isSilver() {
-        return this.equals(SILVER);
-    }
-
-    public boolean isGold() {
-        return this.equals(GOLD);
     }
 }
