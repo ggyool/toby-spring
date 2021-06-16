@@ -136,6 +136,31 @@ class UserDaoTest {
         assertThat(users).hasSize(0);
     }
 
+    // where절을 빼먹는 상황을 검사하기 위해 2명을 확인한다.
+    @DisplayName("유저 정보 수정")
+    @Test
+    void update() {
+        // given
+        userDao.add(userA);
+        userDao.add(userB);
+        User updatedUser = new User(
+            userA.getId(),
+            "modi " + userA.getName(),
+            "modi " + userA.getPassword(),
+            Level.GOLD,
+            1000,
+            1000
+        );
+
+        // when
+        userDao.update(updatedUser);
+
+        // then
+        checkSameValue(userDao.get(userA.getId()), updatedUser);
+        checkSameValue(userDao.get(userB.getId()), userB);
+    }
+
+
     private void checkSameValue(User userA, User userB) {
         assertThat(userA).usingRecursiveComparison()
             .isEqualTo(userB);
