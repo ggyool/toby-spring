@@ -2,6 +2,7 @@ package org.ggyool.toby.user.service;
 
 import java.util.List;
 import org.ggyool.toby.user.dao.UserDao;
+import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
 
 public class UserService {
@@ -19,9 +20,18 @@ public class UserService {
         });
     }
 
-    // TODO : 개인적으로 모델을 설계하고 싶은 포인트라서 임시 브랜치 만들기 위해 커밋
     private void upgradeLevel(User user) {
-
+        boolean isChanged = false;
+        if (user.isBasicLevel() && user.getLogin() >= 50) {
+            user.setLevel(Level.SILVER);
+            isChanged = true;
+        } else if(user.isSilverLevel() && user.getRecommend() >= 30) {
+            user.setLevel(Level.GOLD);
+            isChanged = true;
+        }
+        if (isChanged) {
+            userDao.update(user);
+        }
     }
 
     public void setUserDao(UserDao userDao) {
