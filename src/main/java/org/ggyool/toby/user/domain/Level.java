@@ -21,7 +21,7 @@ public enum Level {
             .findAny()
             .orElseThrow(() -> new IllegalArgumentException("해당 값을 가지는 Level은 없습니다."));
     }
-    
+
     public int getValue() {
         return value;
     }
