@@ -19,8 +19,11 @@
     <property name="jdbcTemplate" ref="jdbcTemplate"/>
   </bean>
 
+  <bean id="levelDeterminer" class="org.ggyool.toby.user.domain.level.BasicLevelDeterminer"/>
+
   <bean id="userService" class="org.ggyool.toby.user.service.UserService">
     <property name="userDao" ref="userDao"/>
+    <property name="levelDeterminer" ref="levelDeterminer"/>
   </bean>
 
 </beans>

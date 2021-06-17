@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 import java.util.function.BiPredicate;
 import org.ggyool.toby.user.domain.User;
 
-public class BasicLevelDeterminer implements LevelDeterminer {
+public class BasicLevelDeterminer extends AbstractLevelDeterminer {
 
     private static final Map<BiPredicate<Integer, Integer>, Level> CHECKER;
 

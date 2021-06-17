@@ -21,6 +21,10 @@ public enum Level {
             .orElseThrow(() -> new IllegalArgumentException("해당 값을 가지는 Level은 없습니다."));
     }
 
+    public boolean isSame(Level level) {
+        return this.equals(level);
+    }
+
     public int getValue() {
         return value;
     }

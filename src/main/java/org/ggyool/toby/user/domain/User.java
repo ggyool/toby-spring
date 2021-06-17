@@ -1,5 +1,6 @@
 package org.ggyool.toby.user.domain;
 
+import org.ggyool.toby.user.domain.level.AbstractLevelDeterminer;
 import org.ggyool.toby.user.domain.level.Level;
 import org.ggyool.toby.user.domain.level.LevelDeterminer;
 
@@ -28,8 +29,16 @@ public class User {
         this.recommend = recommend;
     }
 
+    public boolean canUpgrade(LevelDeterminer levelDeterminer) {
+        return ((AbstractLevelDeterminer) levelDeterminer).hasChangeable(this);
+    }
+
     public void upgradeLevel(LevelDeterminer levelDeterminer) {
         level = levelDeterminer.determine(this);
+    }
+
+    public boolean hasSameLevel(Level level) {
+        return this.level.isSame(level);
     }
 
     public int getLevelValue() {
