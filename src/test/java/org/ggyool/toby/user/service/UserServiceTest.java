@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.ggyool.toby.user.service.UserService.MIN_GOLD_RECOMMEND_COUNT;
 import static org.ggyool.toby.user.service.UserService.MIN_SILVER_LOGIN_COUNT;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import javax.sql.DataSource;
 import org.ggyool.toby.user.dao.UserDao;
 import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -27,6 +30,9 @@ class UserServiceTest {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private DataSource dataSource;
 
     private User basicUser, silverUserSoon, silverUser, goldUserSoon, goldUser;
     private List<User> users;
@@ -67,7 +73,7 @@ class UserServiceTest {
 
     @DisplayName("유저들 등급 정보를 수정하여 반영한다.")
     @Test
-    void upgradeLevels() {
+    void upgradeLevels() throws SQLException {
         // given
         users.forEach(userDao::add);
 
@@ -97,13 +103,14 @@ class UserServiceTest {
         // given
         userService = new FakeUserService(goldUserSoon.getId());
         userService.setUserDao(userDao);
+        userService.setDataSource(dataSource);
         users.forEach(userService::add);
 
         // when
         try {
             userService.upgradeLevels();
             fail("upgrade 동작 중 실패해야 합니다.");
-        } catch (FakeUserService.ArtificialUserServiceException e) {
+        } catch (ArtificialUserServiceException | SQLException e) {
         }
 
         // then
@@ -111,7 +118,6 @@ class UserServiceTest {
             user -> checkLevel(user, user.getLevel())
         );
     }
-
 
     private static class FakeUserService extends UserService {
 
@@ -128,9 +134,9 @@ class UserServiceTest {
             }
             super.upgradeLevel(user);
         }
+    }
 
-        private static class ArtificialUserServiceException extends RuntimeException {
+    private static class ArtificialUserServiceException extends RuntimeException {
 
-        }
     }
 }
