@@ -24,12 +24,17 @@ public class User {
     }
 
     public void upgradeLevel() {
-        Level nextLevel = level.getNext();
+        Level nextLevel = getNextLevel();
         if (Objects.isNull(nextLevel)) {
             throw new IllegalStateException("더 이상 등급 업그레이드가 불가능합니다. 현재 등급 : " + level);
         }
         level = nextLevel;
     }
+
+    public Level getNextLevel() {
+        return level.getNext();
+    }
+
     public int getLevelValue() {
         return level.getValue();
     }

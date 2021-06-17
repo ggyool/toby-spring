@@ -8,6 +8,9 @@ import org.ggyool.toby.user.domain.User;
 
 public class UserService {
 
+    public static final int MIN_SILVER_LOGIN_COUNT = 50;
+    public static final int MIN_GOLD_RECOMMEND_COUNT = 30;
+
     private UserDao userDao;
 
     public UserService() {
@@ -33,9 +36,9 @@ public class UserService {
         Level level = user.getLevel();
         switch (level) {
             case BASIC:
-                return user.getLogin() >= 50;
+                return user.getLogin() >= MIN_SILVER_LOGIN_COUNT;
             case SILVER:
-                return user.getRecommend() >= 30;
+                return user.getRecommend() >= MIN_GOLD_RECOMMEND_COUNT;
             case GOLD:
                 return false;
             default:
