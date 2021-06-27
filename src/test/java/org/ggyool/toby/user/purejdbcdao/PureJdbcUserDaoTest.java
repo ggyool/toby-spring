@@ -31,7 +31,7 @@ class PureJdbcUserDaoTest {
     @BeforeEach
     void setUp() throws Throwable {
         pureJdbcDao.deleteAll();
-        pureJdbcDao.add(new User("existent", "존재", "password", Level.BASIC, 0, 0));
+        pureJdbcDao.add(new User("existent", "존재", "password", "email@email.com", Level.BASIC, 0, 0));
     }
 
     @DisplayName("유저 조회")
@@ -48,7 +48,7 @@ class PureJdbcUserDaoTest {
     @Test
     void add() throws Throwable {
         // given
-        User user = new User("ggyool", "뀰", "password", Level.BASIC, 0, 0);
+        User user = new User("ggyool", "뀰", "password", "ggyool@ggyool.com", Level.BASIC, 0, 0);
         pureJdbcDao.add(user);
 
         // when
@@ -62,7 +62,8 @@ class PureJdbcUserDaoTest {
     @Test
     void add_negativeCase_existentId() {
         // when, then
-        assertThatThrownBy(() -> pureJdbcDao.add(new User("existent", "새로운유저", "password", Level.BASIC, 0, 0)))
-            .isInstanceOf(DuplicateKeyException.class);
+        assertThatThrownBy(
+            () -> pureJdbcDao.add(new User("existent", "새로운유저", "password", "existent@email.com", Level.BASIC, 0, 0))
+        ).isInstanceOf(DuplicateKeyException.class);
     }
 }

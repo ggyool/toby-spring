@@ -15,7 +15,7 @@ class UserTest {
 
     @BeforeEach
     void setUp() {
-        user = new User("userId", "userName", "pswd", null, 0, 0);
+        user = new User("userId", "userName", "pswd", "email", null, 0, 0);
     }
 
     @DisplayName("유저의 등급 업그레이드에 성공")

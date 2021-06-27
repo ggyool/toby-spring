@@ -38,9 +38,9 @@ class UserDaoTest {
     @BeforeEach
     void setUp() {
         userDao.deleteAll();
-        userA = new User("aaa", "에이", "apswd", Level.BASIC, 1, 0);
-        userB = new User("bbb", "비", "bpswd", Level.SILVER, 55, 10);
-        userC = new User("ccc", "씨", "cpswd", Level.GOLD, 100, 40);
+        userA = new User("aaa", "에이", "apswd", "aaa@email.com", Level.BASIC, 1, 0);
+        userB = new User("bbb", "비", "bpswd", "bbb@email.com", Level.SILVER, 55, 10);
+        userC = new User("ccc", "씨", "cpswd", "ccc@email.com", Level.GOLD, 100, 40);
     }
 
     @DisplayName("유저 추가 및 조회")
@@ -69,7 +69,7 @@ class UserDaoTest {
 
         // when, then
         assertThatThrownBy(() -> userDao.add(
-            new User("aaa", "새로운유저", "password", Level.BASIC, 0, 0)
+            new User("aaa", "새로운유저", "password", "aaa@email.com", Level.BASIC, 0, 0)
             )
         ).isInstanceOf(DuplicateKeyException.class);
     }
@@ -149,6 +149,7 @@ class UserDaoTest {
             userA.getId(),
             "modi " + userA.getName(),
             "modi " + userA.getPassword(),
+            "modi" + userA.getEmail(),
             Level.GOLD,
             1000,
             1000

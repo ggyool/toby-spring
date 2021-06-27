@@ -23,6 +23,9 @@ dependencies {
 	// DB
 	implementation 'mysql:mysql-connector-java'
 	implementation'com.h2database:h2'
+
+	// etc
+	implementation group: 'javax.mail', name: 'javax.mail-api', version: '1.6.2'
 }
 
 test {

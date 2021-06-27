@@ -39,11 +39,11 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         users = Arrays.asList(
-            basicUser = new User("a", "nameA", "pswdA", Level.BASIC, MIN_SILVER_LOGIN_COUNT - 1, 0),
-            silverUserSoon = new User("b", "nameB", "pswdB", Level.BASIC, MIN_SILVER_LOGIN_COUNT, 0),
-            silverUser = new User("c", "nameC", "pswdC", Level.SILVER, 60, MIN_GOLD_RECOMMEND_COUNT - 1),
-            goldUserSoon = new User("d", "nameD", "pswdD", Level.SILVER, 60, MIN_GOLD_RECOMMEND_COUNT),
-            goldUser = new User("e", "nameE", "pswdE", Level.GOLD, 100, 100)
+            basicUser = new User("a", "nameA", "pswdA", "a@email.com", Level.BASIC, MIN_SILVER_LOGIN_COUNT - 1, 0),
+            silverUserSoon = new User("b", "nameB", "pswdB", "b@email.com", Level.BASIC, MIN_SILVER_LOGIN_COUNT, 0),
+            silverUser = new User("c", "nameC", "pswdC", "c@email.com", Level.SILVER, 60, MIN_GOLD_RECOMMEND_COUNT - 1),
+            goldUserSoon = new User("d", "nameD", "pswdD", "d@email.com", Level.SILVER, 60, MIN_GOLD_RECOMMEND_COUNT),
+            goldUser = new User("e", "nameE", "pswdE", "e@email.com", Level.GOLD, 100, 100)
         );
         userDao.deleteAll();
     }
@@ -51,7 +51,7 @@ class UserServiceTest {
     @DisplayName("유저를 추가한다 - 등급이 정해져 있지 않은 유저는 Basic 등급을 가진다.")
     @Test
     void add() {
-        User nullLevelUser = new User("n", "nameN", "pswdN", null, 0, 0);
+        User nullLevelUser = new User("n", "nameN", "pswdN", "emailN", null, 0, 0);
         userService.add(nullLevelUser);
         checkLevel(nullLevelUser, Level.BASIC);
 

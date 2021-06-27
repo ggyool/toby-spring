@@ -29,7 +29,7 @@ public class UserDaoXmlConfigTest {
     @Test
     void get() throws SQLException, ClassNotFoundException {
         // given
-        userDao.add(new User("existent", "존재", "password", Level.BASIC, 0, 0));
+        userDao.add(new User("existent", "존재", "password", "existent@email.com", Level.BASIC, 0, 0));
 
         // when
         User findUser = userDao.get("existent");
@@ -42,7 +42,7 @@ public class UserDaoXmlConfigTest {
     @Test
     void add() throws SQLException, ClassNotFoundException {
         // given
-        User user = new User("ggyool", "뀰", "password", Level.BASIC, 0, 0);
+        User user = new User("ggyool", "뀰", "password", "ggyool@email.com", Level.BASIC, 0, 0);
         userDao.add(user);
 
         // when

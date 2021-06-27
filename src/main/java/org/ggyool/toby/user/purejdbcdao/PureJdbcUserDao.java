@@ -18,13 +18,13 @@ public class PureJdbcUserDao {
             rs.getString("id"),
             rs.getString("name"),
             rs.getString("password"),
+            rs.getString("email"),
             Level.from(rs.getInt("level")),
             rs.getInt("login"),
             rs.getInt("recommend")
         );
 
     private final SQLExceptionTranslator sqlTranslator;
-
 
     public PureJdbcUserDao(JdbcContext jdbcContext) {
         this.jdbcContext = jdbcContext;
