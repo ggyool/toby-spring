@@ -8,7 +8,6 @@ import static org.ggyool.toby.user.service.UserService.MIN_SILVER_LOGIN_COUNT;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import javax.sql.DataSource;
 import org.ggyool.toby.user.dao.UserDao;
 import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
@@ -17,9 +16,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/applicationContext.xml")
@@ -32,7 +31,7 @@ class UserServiceTest {
     private UserDao userDao;
 
     @Autowired
-    private DataSource dataSource;
+    private PlatformTransactionManager transactionManager;
 
     private User basicUser, silverUserSoon, silverUser, goldUserSoon, goldUser;
     private List<User> users;
@@ -103,14 +102,14 @@ class UserServiceTest {
         // given
         userService = new FakeUserService(goldUserSoon.getId());
         userService.setUserDao(userDao);
-        userService.setDataSource(dataSource);
+        userService.setTransactionManager(transactionManager);
         users.forEach(userService::add);
 
         // when
         try {
             userService.upgradeLevels();
             fail("upgrade 동작 중 실패해야 합니다.");
-        } catch (ArtificialUserServiceException | SQLException e) {
+        } catch (ArtificialUserServiceException e) {
         }
 
         // then
