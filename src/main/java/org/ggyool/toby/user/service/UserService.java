@@ -12,6 +12,10 @@ import javax.mail.internet.MimeMessage;
 import org.ggyool.toby.user.dao.UserDao;
 import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -23,6 +27,7 @@ public class UserService {
 
     private UserDao userDao;
     private PlatformTransactionManager transactionManager;
+    private MailSender mailSender;
 
     public UserService() {
     }
@@ -102,21 +107,32 @@ public class UserService {
         sendUpgradeEmail(user);
     }
 
-    private void sendUpgradeEmail(User user) {
-        Properties props = new Properties();
-        props.put("mail.smtp.host", "mail.ksug.org");
-        Session session = Session.getInstance(props, null);
+    // JavaMail API 사용
+//    private void sendUpgradeEmail(User user) {
+//        Properties props = new Properties();
+//        props.put("mail.smtp.host", "mail.ksug.org");
+//        Session session = Session.getInstance(props, null);
+//
+//        MimeMessage message = new MimeMessage(session);
+//        try {
+//            message.setFrom(new InternetAddress("useradmin@ksug.org"));
+//            message.setRecipients(Message.RecipientType.TO, user.getEmail());
+//            message.setSubject("Upgrade 안내");
+//            message.setText("사용자님의 등급이 " + user.getLevel().name() + " 로 업그레이드되었습니다.");
+//            Transport.send(message);
+//        } catch (MessagingException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
-        MimeMessage message = new MimeMessage(session);
-        try {
-            message.setFrom(new InternetAddress("useradmin@ksug.org"));
-            message.setRecipients(Message.RecipientType.TO, user.getEmail());
-            message.setSubject("Upgrade 안내");
-            message.setText("사용자님의 등급이 " + user.getLevel().name() + " 로 업그레이드되었습니다.");
-            Transport.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
+    private void sendUpgradeEmail(User user) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setFrom("useradmin@ksug.org");
+        mailMessage.setSubject("Upgrade 안내");
+        mailMessage.setText("사용자님의 등급이 " + user.getLevel().name() + " 로 업그레이드되었습니다.");
+
+        mailSender.send(mailMessage);
     }
 
     public void setUserDao(UserDao userDao) {
@@ -125,5 +141,9 @@ public class UserService {
 
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
+    }
+
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
     }
 }

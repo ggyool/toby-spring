@@ -22,9 +22,12 @@
     <property name="jdbcTemplate" ref="jdbcTemplate"/>
   </bean>
 
+  <bean id="dummyMailSender" class="org.ggyool.toby.user.service.DummyMailSender"/>
+
   <bean id="userService" class="org.ggyool.toby.user.service.UserService">
     <property name="userDao" ref="userDao"/>
     <property name="transactionManager" ref="transactionManager"/>
+    <property name="mailSender" ref="dummyMailSender"/>
   </bean>
 
 </beans>
