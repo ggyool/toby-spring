@@ -2,8 +2,8 @@ package org.ggyool.toby.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.ggyool.toby.user.service.UserService.MIN_GOLD_RECOMMEND_COUNT;
-import static org.ggyool.toby.user.service.UserService.MIN_SILVER_LOGIN_COUNT;
+import static org.ggyool.toby.user.service.UserServiceImpl.MIN_GOLD_RECOMMEND_COUNT;
+import static org.ggyool.toby.user.service.UserServiceImpl.MIN_SILVER_LOGIN_COUNT;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,6 +32,9 @@ class UserServiceTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private UserDao userDao;
@@ -88,7 +91,7 @@ class UserServiceTest {
 
         // 메일 발송 결과를 테스트할 수 있도록 목 오브젝트를 만들어 사용
         MockMailSender mockMailSender = new MockMailSender();
-        userService.setMailSender(mockMailSender);
+        userServiceImpl.setMailSender(mockMailSender);
 
         // when
         userService.upgradeLevels();
@@ -116,19 +119,24 @@ class UserServiceTest {
         }
     }
 
+    @DirtiesContext
     @DisplayName("중간에 한 명이라도 등급 업그레이드에 실패하면 모두 롤백되어야 한다.")
     @Test
     void upgradeLevels_fail_rollback() {
         // given
-        userService = new FakeUserService(goldUserSoon.getId());
-        userService.setUserDao(userDao);
-        userService.setTransactionManager(transactionManager);
-        userService.setMailSender(mailSender);
-        users.forEach(userService::add);
+
+        FakeUserService fakeUserService = new FakeUserService(goldUserSoon.getId());
+        fakeUserService.setUserDao(userDao);
+        fakeUserService.setMailSender(mailSender);
+
+        UserServiceTx userServiceTx = new UserServiceTx();
+        userServiceTx.setTransactionManager(transactionManager);
+        userServiceTx.setUserService(fakeUserService);
+        users.forEach(userServiceTx::add);
 
         // when
         try {
-            userService.upgradeLevels();
+            userServiceTx.upgradeLevels();
             fail("upgrade 동작 중 실패해야 합니다.");
         } catch (ArtificialUserServiceException e) {
         }
@@ -139,7 +147,7 @@ class UserServiceTest {
         );
     }
 
-    private static class FakeUserService extends UserService {
+    private static class FakeUserService extends UserServiceImpl {
 
         private final String exceptionalId;
 

@@ -24,10 +24,13 @@
 
   <bean id="dummyMailSender" class="org.ggyool.toby.user.service.DummyMailSender"/>
 
-  <bean id="userService" class="org.ggyool.toby.user.service.UserService">
+  <bean id="userServiceImpl" class="org.ggyool.toby.user.service.UserServiceImpl">
     <property name="userDao" ref="userDao"/>
-    <property name="transactionManager" ref="transactionManager"/>
     <property name="mailSender" ref="dummyMailSender"/>
+  </bean>
+  <bean id="userService" class="org.ggyool.toby.user.service.UserServiceTx">
+    <property name="userService" ref="userServiceImpl"/>
+    <property name="transactionManager" ref="transactionManager"/>
   </bean>
 
 </beans>
