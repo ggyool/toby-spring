@@ -86,10 +86,9 @@ class UserServiceTest {
     @DisplayName("유저들 등급 정보를 수정하여 반영한다.")
     @Test
     void upgradeLevels() throws SQLException {
-        // given
-        users.forEach(userDao::add);
+        MockUserDao mockUserDao = new MockUserDao(this.users);
+        userServiceImpl.setUserDao(mockUserDao);
 
-        // 메일 발송 결과를 테스트할 수 있도록 목 오브젝트를 만들어 사용
         MockMailSender mockMailSender = new MockMailSender();
         userServiceImpl.setMailSender(mockMailSender);
 
@@ -97,17 +96,22 @@ class UserServiceTest {
         userService.upgradeLevels();
 
         // then
-        checkLevelUpgraded(basicUser, false);
-        checkLevelUpgraded(silverUserSoon, true);
-        checkLevelUpgraded(silverUser, false);
-        checkLevelUpgraded(goldUserSoon, true);
-        checkLevelUpgraded(goldUser, false);
+        List<User> updated = mockUserDao.getUpdated();
+        assertThat(updated).hasSize(2);
+
+        checkUserAndLevel(silverUserSoon, "b", Level.SILVER);
+        checkUserAndLevel(goldUserSoon, "d", Level.GOLD);
 
         List<String> requests = mockMailSender.getRequests();
         assertThat(requests).hasSize(2);
         assertThat(requests).containsExactly(
             silverUserSoon.getEmail(), goldUserSoon.getEmail()
         );
+    }
+
+    private void checkUserAndLevel(User user, String expectedId, Level expectedLevel) {
+        assertThat(user.getId()).isEqualTo(expectedId);
+        assertThat(user.getLevel()).isEqualTo(expectedLevel);
     }
 
     private void checkLevelUpgraded(User user, boolean upgraded) {
@@ -183,6 +187,55 @@ class UserServiceTest {
 
         @Override
         public void send(SimpleMailMessage... simpleMessages) throws MailException {
+        }
+    }
+
+    private static class MockUserDao implements UserDao {
+
+        private List<User> users; // 레벨 업그레이드 후보
+        private List<User> updated = new ArrayList<>(); // 업그레이드 대상 오브젝트
+
+        public MockUserDao(List<User> users) {
+            this.users = users;
+        }
+
+        public List<User> getUpdated() {
+            return updated;
+        }
+
+        @Override
+        public User get(String id) {
+            return null;
+        }
+
+        @Override
+        public List<User> getAllAsc() {
+            return this.users;
+        }
+
+        @Override
+        public Integer getCount() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void add(User user) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void deleteAll() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void deleteById(String id) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void update(User user) {
+            updated.add(user);
         }
     }
 }
