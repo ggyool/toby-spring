@@ -6,6 +6,7 @@ import static org.ggyool.toby.user.service.UserService.MIN_GOLD_RECOMMEND_COUNT;
 import static org.ggyool.toby.user.service.UserService.MIN_SILVER_LOGIN_COUNT;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.ggyool.toby.user.dao.UserDao;
@@ -16,11 +17,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 
+//@TestMethodOrder(OrderAnnotation.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/applicationContext.xml")
 class UserServiceTest {
@@ -74,11 +79,16 @@ class UserServiceTest {
             .isEqualTo(level);
     }
 
+    @DirtiesContext
     @DisplayName("유저들 등급 정보를 수정하여 반영한다.")
     @Test
     void upgradeLevels() throws SQLException {
         // given
         users.forEach(userDao::add);
+
+        // 메일 발송 결과를 테스트할 수 있도록 목 오브젝트를 만들어 사용
+        MockMailSender mockMailSender = new MockMailSender();
+        userService.setMailSender(mockMailSender);
 
         // when
         userService.upgradeLevels();
@@ -89,6 +99,12 @@ class UserServiceTest {
         checkLevelUpgraded(silverUser, false);
         checkLevelUpgraded(goldUserSoon, true);
         checkLevelUpgraded(goldUser, false);
+
+        List<String> requests = mockMailSender.getRequests();
+        assertThat(requests).hasSize(2);
+        assertThat(requests).containsExactly(
+            silverUserSoon.getEmail(), goldUserSoon.getEmail()
+        );
     }
 
     private void checkLevelUpgraded(User user, boolean upgraded) {
@@ -142,5 +158,23 @@ class UserServiceTest {
 
     private static class ArtificialUserServiceException extends RuntimeException {
 
+    }
+
+    private static class MockMailSender implements MailSender {
+
+        private List<String> requests = new ArrayList<>();
+
+        public List<String> getRequests() {
+            return requests;
+        }
+
+        @Override
+        public void send(SimpleMailMessage simpleMessage) throws MailException {
+            requests.add(simpleMessage.getTo()[0]);
+        }
+
+        @Override
+        public void send(SimpleMailMessage... simpleMessages) throws MailException {
+        }
     }
 }
