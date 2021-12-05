@@ -1,38 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-    <property name="driverClass" value="com.mysql.cj.jdbc.Driver"/>
-    <property name="url"
-      value="jdbc:mysql://localhost:13306/toby_db?userSSL=false&amp;serverTimezone=Asia/Seoul&amp;characterEncoding=UTF-8"/>
-    <property name="username" value="root"/>
-    <property name="password" value="root"/>
-  </bean>
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url"
+                  value="jdbc:mysql://localhost:13306/toby_db?userSSL=false&amp;serverTimezone=Asia/Seoul&amp;characterEncoding=UTF-8"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
 
-  <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-    <property name="dataSource" ref="dataSource"/>
-  </bean>
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
 
-  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-    <property name="dataSource" ref="dataSource"/>
-  </bean>
-  <bean id="userDao" class="org.ggyool.toby.user.dao.UserDaoJdbc">
-    <property name="jdbcTemplate" ref="jdbcTemplate"/>
-  </bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="userDao" class="org.ggyool.toby.user.dao.UserDaoJdbc">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
 
-  <bean id="dummyMailSender" class="org.ggyool.toby.user.service.DummyMailSender"/>
+    <bean id="dummyMailSender" class="org.ggyool.toby.user.service.DummyMailSender"/>
 
-  <bean id="userServiceImpl" class="org.ggyool.toby.user.service.UserServiceImpl">
-    <property name="userDao" ref="userDao"/>
-    <property name="mailSender" ref="dummyMailSender"/>
-  </bean>
-  <bean id="userService" class="org.ggyool.toby.factorybean.TxProxyFactoryBean">
-    <property name="target" ref="userServiceImpl"/>
-    <property name="transactionManager" ref="transactionManager"/>
-    <property name="pattern" value="upgradeLevels"/>
-    <property name="serviceInterface" value="org.ggyool.toby.user.service.UserService"/>
-  </bean>
+    <bean id="userServiceImpl" class="org.ggyool.toby.user.service.UserServiceImpl">
+        <property name="userDao" ref="userDao"/>
+        <property name="mailSender" ref="dummyMailSender"/>
+    </bean>
+
+    <bean id="transactionAdvice" class="org.ggyool.toby.factorybean.advice.TransactionAdvice">
+        <property name="transactionManager" ref="transactionManager"/>
+    </bean>
+
+    <bean id="transactionPointcut" class="org.springframework.aop.support.NameMatchMethodPointcut">
+        <property name="mappedName" value="upgrade*"/>
+    </bean>
+
+    <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice" ref="transactionAdvice"/>
+        <property name="pointcut" ref="transactionPointcut"/>
+    </bean>
+
+    <bean id="userService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target" ref="userServiceImpl"/>
+        <!--
+           어드바이스와 어드바이저를 동시에 설정할 수 있는 프로퍼티, 리스트에 어드바이스나 어드바이저의 빈 아이디를 값으로 넣어주면 된다.
+        -->
+        <property name="interceptorNames">
+            <list>
+                <value>transactionAdvisor</value>
+            </list>
+        </property>
+    </bean>
 
 </beans>

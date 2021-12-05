@@ -1,14 +1,16 @@
 package org.ggyool.toby.user.service;
 
-import org.ggyool.toby.factorybean.TxProxyFactoryBean;
+import org.ggyool.toby.factorybean.LegacyTxProxyFactoryBean;
 import org.ggyool.toby.handler.TransactionHandler;
 import org.ggyool.toby.user.dao.UserDao;
 import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
@@ -194,6 +196,7 @@ class UserServiceTest {
     // TxProxyFactoryBean 으로 UserService 를 빈을 등록하였다.
     // 의존성이 주입되어서, userService 의 transactionHandler 가 가지고 있는 target 을 수정하기 어렵다.
     // 직접 빈을 생성하여 테스트한다.
+    @Disabled
     @Test
     @DirtiesContext
     void upgradeLevels_fail_rollback_with_factory_bean() throws Exception {
@@ -202,7 +205,35 @@ class UserServiceTest {
         fakeUserService.setUserDao(userDao);
         fakeUserService.setMailSender(mailSender);
 
-        TxProxyFactoryBean txProxyFactoryBean = applicationContext.getBean("&userService", TxProxyFactoryBean.class);
+        LegacyTxProxyFactoryBean txProxyFactoryBean = applicationContext.getBean("&userService", LegacyTxProxyFactoryBean.class);
+        txProxyFactoryBean.setTarget(fakeUserService);
+        UserService userService = (UserService) txProxyFactoryBean.getObject();
+
+        users.forEach(userService::add);
+
+        // when
+        try {
+            userService.upgradeLevels();
+            fail("upgrade 동작 중 실패해야 합니다.");
+        } catch (ArtificialUserServiceException e) {
+        }
+
+        // then
+        users.forEach(
+                user -> checkLevel(user, user.getLevel())
+        );
+    }
+
+    @Test
+    @DirtiesContext
+    void upgradeLevels_fail_rollback_with_proxy_factory_bean() throws Exception {
+        // given
+        FakeUserService fakeUserService = new FakeUserService(goldUserSoon.getId());
+        fakeUserService.setUserDao(userDao);
+        fakeUserService.setMailSender(mailSender);
+
+
+        ProxyFactoryBean txProxyFactoryBean = applicationContext.getBean("&userService", ProxyFactoryBean.class);
         txProxyFactoryBean.setTarget(fakeUserService);
         UserService userService = (UserService) txProxyFactoryBean.getObject();
 

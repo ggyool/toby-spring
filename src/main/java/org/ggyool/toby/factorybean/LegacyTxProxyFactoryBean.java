@@ -6,7 +6,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.lang.reflect.Proxy;
 
-public class TxProxyFactoryBean implements FactoryBean<Object> { // 범용적으로 사용하기 위해 Object
+public class LegacyTxProxyFactoryBean implements FactoryBean<Object> { // 범용적으로 사용하기 위해 Object
 
     // TransactionHandler 생성시 필요한 멤버들
     private Object target;
