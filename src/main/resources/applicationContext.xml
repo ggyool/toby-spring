@@ -28,9 +28,11 @@
     <property name="userDao" ref="userDao"/>
     <property name="mailSender" ref="dummyMailSender"/>
   </bean>
-  <bean id="userService" class="org.ggyool.toby.user.service.UserServiceTx">
-    <property name="userService" ref="userServiceImpl"/>
+  <bean id="userService" class="org.ggyool.toby.factorybean.TxProxyFactoryBean">
+    <property name="target" ref="userServiceImpl"/>
     <property name="transactionManager" ref="transactionManager"/>
+    <property name="pattern" value="upgradeLevels"/>
+    <property name="serviceInterface" value="org.ggyool.toby.user.service.UserService"/>
   </bean>
 
 </beans>

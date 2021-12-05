@@ -1,14 +1,16 @@
 package org.ggyool.toby.user.service;
 
+import org.ggyool.toby.factorybean.TxProxyFactoryBean;
+import org.ggyool.toby.handler.TransactionHandler;
 import org.ggyool.toby.user.dao.UserDao;
 import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
-import org.ggyool.toby.handler.TransactionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -32,6 +34,9 @@ import static org.ggyool.toby.user.service.UserServiceImpl.MIN_SILVER_LOGIN_COUN
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/applicationContext.xml")
 class UserServiceTest {
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Autowired
     private UserService userService;
@@ -176,6 +181,36 @@ class UserServiceTest {
         // when
         try {
             proxy.upgradeLevels();
+            fail("upgrade 동작 중 실패해야 합니다.");
+        } catch (ArtificialUserServiceException e) {
+        }
+
+        // then
+        users.forEach(
+                user -> checkLevel(user, user.getLevel())
+        );
+    }
+
+    // TxProxyFactoryBean 으로 UserService 를 빈을 등록하였다.
+    // 의존성이 주입되어서, userService 의 transactionHandler 가 가지고 있는 target 을 수정하기 어렵다.
+    // 직접 빈을 생성하여 테스트한다.
+    @Test
+    @DirtiesContext
+    void upgradeLevels_fail_rollback_with_factory_bean() throws Exception {
+        // given
+        FakeUserService fakeUserService = new FakeUserService(goldUserSoon.getId());
+        fakeUserService.setUserDao(userDao);
+        fakeUserService.setMailSender(mailSender);
+
+        TxProxyFactoryBean txProxyFactoryBean = applicationContext.getBean("&userService", TxProxyFactoryBean.class);
+        txProxyFactoryBean.setTarget(fakeUserService);
+        UserService userService = (UserService) txProxyFactoryBean.getObject();
+
+        users.forEach(userService::add);
+
+        // when
+        try {
+            userService.upgradeLevels();
             fail("upgrade 동작 중 실패해야 합니다.");
         } catch (ArtificialUserServiceException e) {
         }
