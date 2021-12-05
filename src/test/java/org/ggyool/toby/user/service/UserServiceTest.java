@@ -1,17 +1,9 @@
 package org.ggyool.toby.user.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.ggyool.toby.user.service.UserServiceImpl.MIN_GOLD_RECOMMEND_COUNT;
-import static org.ggyool.toby.user.service.UserServiceImpl.MIN_SILVER_LOGIN_COUNT;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.ggyool.toby.user.dao.UserDao;
 import org.ggyool.toby.user.domain.Level;
 import org.ggyool.toby.user.domain.User;
+import org.ggyool.toby.handler.TransactionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +16,17 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import java.lang.reflect.Proxy;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.ggyool.toby.user.service.UserServiceImpl.MIN_GOLD_RECOMMEND_COUNT;
+import static org.ggyool.toby.user.service.UserServiceImpl.MIN_SILVER_LOGIN_COUNT;
 
 //@TestMethodOrder(OrderAnnotation.class)
 @ExtendWith(SpringExtension.class)
@@ -51,11 +54,11 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         users = Arrays.asList(
-            basicUser = new User("a", "nameA", "pswdA", "a@email.com", Level.BASIC, MIN_SILVER_LOGIN_COUNT - 1, 0),
-            silverUserSoon = new User("b", "nameB", "pswdB", "b@email.com", Level.BASIC, MIN_SILVER_LOGIN_COUNT, 0),
-            silverUser = new User("c", "nameC", "pswdC", "c@email.com", Level.SILVER, 60, MIN_GOLD_RECOMMEND_COUNT - 1),
-            goldUserSoon = new User("d", "nameD", "pswdD", "d@email.com", Level.SILVER, 60, MIN_GOLD_RECOMMEND_COUNT),
-            goldUser = new User("e", "nameE", "pswdE", "e@email.com", Level.GOLD, 100, 100)
+                basicUser = new User("a", "nameA", "pswdA", "a@email.com", Level.BASIC, MIN_SILVER_LOGIN_COUNT - 1, 0),
+                silverUserSoon = new User("b", "nameB", "pswdB", "b@email.com", Level.BASIC, MIN_SILVER_LOGIN_COUNT, 0),
+                silverUser = new User("c", "nameC", "pswdC", "c@email.com", Level.SILVER, 60, MIN_GOLD_RECOMMEND_COUNT - 1),
+                goldUserSoon = new User("d", "nameD", "pswdD", "d@email.com", Level.SILVER, 60, MIN_GOLD_RECOMMEND_COUNT),
+                goldUser = new User("e", "nameE", "pswdE", "e@email.com", Level.GOLD, 100, 100)
         );
         userDao.deleteAll();
     }
@@ -79,7 +82,7 @@ class UserServiceTest {
 
     private void checkLevel(User user, Level level) {
         assertThat(userDao.get(user.getId())).extracting("level")
-            .isEqualTo(level);
+                .isEqualTo(level);
     }
 
     @DirtiesContext
@@ -105,7 +108,7 @@ class UserServiceTest {
         List<String> requests = mockMailSender.getRequests();
         assertThat(requests).hasSize(2);
         assertThat(requests).containsExactly(
-            silverUserSoon.getEmail(), goldUserSoon.getEmail()
+                silverUserSoon.getEmail(), goldUserSoon.getEmail()
         );
     }
 
@@ -147,7 +150,39 @@ class UserServiceTest {
 
         // then
         users.forEach(
-            user -> checkLevel(user, user.getLevel())
+                user -> checkLevel(user, user.getLevel())
+        );
+    }
+
+    @DirtiesContext
+    @DisplayName("중간에 한 명이라도 등급 업그레이드에 실패하면 모두 롤백되어야 한다. (프록시 사용)")
+    @Test
+    void upgradeLevels_fail_rollback_with_proxy() {
+        // given
+        FakeUserService fakeUserService = new FakeUserService(goldUserSoon.getId());
+        fakeUserService.setUserDao(userDao);
+        fakeUserService.setMailSender(mailSender);
+
+        TransactionHandler transactionHandler = new TransactionHandler();
+        transactionHandler.setPattern("upgradeLevels");
+        transactionHandler.setTarget(fakeUserService);
+        transactionHandler.setTransactionManager(transactionManager);
+
+        UserService proxy = (UserService) Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class[]{UserService.class}, transactionHandler
+        );
+        users.forEach(proxy::add);
+
+        // when
+        try {
+            proxy.upgradeLevels();
+            fail("upgrade 동작 중 실패해야 합니다.");
+        } catch (ArtificialUserServiceException e) {
+        }
+
+        // then
+        users.forEach(
+                user -> checkLevel(user, user.getLevel())
         );
     }
 
